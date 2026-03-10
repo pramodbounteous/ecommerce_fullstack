@@ -46,7 +46,7 @@ model Product {
   cartItems  CartItem[]
   orderItems OrderItem[]
   featured   FeaturedProduct[]
-}
+} 
 
 model FeaturedProduct {
   id        Int      @id @default(autoincrement())
