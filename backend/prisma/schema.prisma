@@ -39,6 +39,7 @@ model Product {
   description String
   image       String
   price       Float
+  stock       Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -73,6 +74,8 @@ model CartItem {
 
   cart    Cart    @relation(fields: [cartId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
 }
 
 model Order {
@@ -89,10 +92,11 @@ model Order {
 }
 
 model OrderItem {
-  id         Int     @id @default(autoincrement())
+  id         Int @id @default(autoincrement())
   orderId    Int
   productId  Int
   quantity   Int
+  unitPrice  Float
   totalPrice Float
 
   order   Order   @relation(fields: [orderId], references: [id])
@@ -104,6 +108,7 @@ model RefreshToken {
   userId    Int
   token     String
   expiresAt DateTime
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }
