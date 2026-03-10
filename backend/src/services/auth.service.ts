@@ -1,6 +1,10 @@
 import prisma from "../config/prisma";
 import { hashPassword, comparePassword } from "../utils/hash";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken
+} from "../utils/jwt";
 import { AppError } from "../utils/AppError";
 
 export async function registerUser(data: any) {
@@ -23,8 +27,13 @@ export async function registerUser(data: any) {
     }
   });
 
-  const accessToken = generateAccessToken(user.id);
-  const refreshToken = generateRefreshToken(user.id);
+  const payload = {
+    userId: user.id,
+    role: user.role
+  };
+
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
 
   await prisma.refreshToken.create({
     data: {
@@ -53,8 +62,13 @@ export async function loginUser(data: any) {
     throw new AppError("Invalid credentials", 401);
   }
 
-  const accessToken = generateAccessToken(user.id);
-  const refreshToken = generateRefreshToken(user.id);
+  const payload = {
+    userId: user.id,
+    role: user.role
+  };
+
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
 
   await prisma.refreshToken.create({
     data: {
@@ -65,4 +79,33 @@ export async function loginUser(data: any) {
   });
 
   return { user, accessToken, refreshToken };
+}
+
+export async function refreshAccessToken(token: string) {
+
+  const payload: any = verifyRefreshToken(token);
+
+  const storedToken = await prisma.refreshToken.findFirst({
+    where: { token }
+  });
+
+  if (!storedToken) {
+    throw new AppError("Invalid refresh token", 401);
+  }
+
+  const newAccessToken = generateAccessToken({
+    userId: payload.userId,
+    role: payload.role
+  });
+
+  return { accessToken: newAccessToken };
+}
+
+export async function logoutUser(token: string) {
+
+  await prisma.refreshToken.deleteMany({
+    where: { token }
+  });
+
+  return { message: "Logged out successfully" };
 }

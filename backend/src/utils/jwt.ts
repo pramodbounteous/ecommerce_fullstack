@@ -1,19 +1,28 @@
 import jwt from "jsonwebtoken";
 
-export function generateAccessToken(userId: number) {
+interface TokenPayload {
+  userId: number;
+  role: string;
+}
+
+export function generateAccessToken(payload: TokenPayload) {
   return jwt.sign(
-    { userId },
+    payload,
     process.env.JWT_ACCESS_SECRET!,
     { expiresIn: "15m" }
   );
 }
 
-export function generateRefreshToken(userId: number) {
+export function generateRefreshToken(payload: TokenPayload) {
   return jwt.sign(
-    { userId },
+    payload,
     process.env.JWT_REFRESH_SECRET!,
     { expiresIn: "7d" }
   );
+}
+
+export function verifyAccessToken(token: string) {
+  return jwt.verify(token, process.env.JWT_ACCESS_SECRET!);
 }
 
 export function verifyRefreshToken(token: string) {

@@ -33,3 +33,12 @@ Added global error handling
 Added async handler for controllers
 Added Zod validation middleware
 Created base API routing system
+
+
+Day 5
+
+Implemented full authentication lifecycle
+Added access token middleware
+Added role authorization middleware
+Implemented refresh token rotation
+Added logout endpoint
