@@ -25,3 +25,11 @@ Connected Render PostgreSQL database
 Ran initial migration
 Generated Prisma client
 Tested database connection through Express server
+
+Day 4
+
+Created backend production architecture
+Added global error handling
+Added async handler for controllers
+Added Zod validation middleware
+Created base API routing system
