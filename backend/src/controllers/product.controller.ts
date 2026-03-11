@@ -3,7 +3,9 @@ import {
   createProduct,
   getProducts,
   getProductById,
-  getFeaturedProducts
+  getFeaturedProducts,
+  addFeatured,
+  removeFeatured
 } from "../services/product.service";
 
 export async function create(req: Request, res: Response) {
@@ -18,11 +20,11 @@ export async function create(req: Request, res: Response) {
 
 export async function list(req: Request, res: Response) {
 
-  const products = await getProducts(req.query);
+  const result = await getProducts(req.query);
 
   res.json({
     success: true,
-    data: products
+    data: result
   });
 }
 
@@ -43,5 +45,25 @@ export async function featured(req: Request, res: Response) {
   res.json({
     success: true,
     data: products
+  });
+}
+
+export async function featureProduct(req: Request, res: Response) {
+
+  const result = await addFeatured(Number(req.params.id));
+
+  res.json({
+    success: true,
+    data: result
+  });
+}
+
+export async function unfeatureProduct(req: Request, res: Response) {
+
+  const result = await removeFeatured(Number(req.params.id));
+
+  res.json({
+    success: true,
+    data: result
   });
 }

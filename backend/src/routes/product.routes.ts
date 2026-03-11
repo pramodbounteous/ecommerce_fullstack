@@ -3,7 +3,9 @@ import {
   create,
   list,
   details,
-  featured
+  featured,
+  featureProduct,
+  unfeatureProduct
 } from "../controllers/product.controller";
 
 import { validate } from "../middlewares/validate.middleware";
@@ -28,6 +30,20 @@ router.post(
   authorizeRole("SELLER"),
   validate(createProductSchema),
   asyncHandler(create)
+);
+
+router.post(
+  "/:id/feature",
+  authMiddleware,
+  authorizeRole("SELLER"),
+  asyncHandler(featureProduct)
+);
+
+router.delete(
+  "/:id/feature",
+  authMiddleware,
+  authorizeRole("SELLER"),
+  asyncHandler(unfeatureProduct)
 );
 
 export default router;
