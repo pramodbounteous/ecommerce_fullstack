@@ -42,3 +42,11 @@ Added access token middleware
 Added role authorization middleware
 Implemented refresh token rotation
 Added logout endpoint
+
+Day 6
+
+Implemented product module
+Created product APIs
+Added product search
+Added featured products endpoint
+Protected product creation with SELLER role
