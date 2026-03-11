@@ -50,3 +50,35 @@ Created product APIs
 Added product search
 Added featured products endpoint
 Protected product creation with SELLER role
+
+Day 7
+
+Added pagination and filtering to product listing
+Implemented featured product management
+Added seller control for featured products
+
+
+Day 8
+
+Implemented cart system
+Add to cart API
+Update quantity API
+Remove cart item API
+Get user cart API
+Handled duplicate products in cart
+
+Day 9
+
+Implemented checkout system
+Created order from cart
+Stored order items
+Reduced product stock
+Cleared cart after order
+Added order history API
+
+Day 11
+
+Implemented user profile API
+Implemented address management
+Added address CRUD endpoints
+Completed backend MVP
