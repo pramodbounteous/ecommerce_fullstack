@@ -29,10 +29,11 @@ export default function ProductPage() {
         <ProductGallery image={data.productImg} />
 
         <ProductInfo
-          title={data.title}
-          price={data.price}
-          description={data.description}
-        />
+            id={data.id}
+            title={data.title}
+            price={data.price}
+            description={data.description}
+/>
 
       </div>
 

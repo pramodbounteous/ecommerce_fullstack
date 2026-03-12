@@ -1,19 +1,33 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useAddToCart } from "@/hooks/useAddToCart"
 
 interface Props {
+  id: number
   title: string
   price: number
   description: string
 }
 
 export default function ProductInfo({
+  id,
   title,
   price,
   description
 }: Props) {
 
   const [qty, setQty] = useState(1)
+
+  const { mutate } = useAddToCart()
+
+  const handleAdd = () => {
+
+    mutate({
+      productId: id,
+      quantity: qty
+    })
+
+  }
 
   return (
 
@@ -51,7 +65,10 @@ export default function ProductInfo({
 
       </div>
 
-      <Button className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+      <Button
+        onClick={handleAdd}
+        className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+      >
         Add to Cart
       </Button>
 
