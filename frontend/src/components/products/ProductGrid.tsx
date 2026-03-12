@@ -1,33 +1,25 @@
 import ProductCard from "./ProductCard"
+import { useProducts } from "@/hooks/useProducts"
 
 export default function ProductGrid() {
 
-  const products = [
-    {
-      id: 1,
-      title: "Smart Watch",
-      price: 299,
-      image: "https://via.placeholder.com/200"
-    },
-    {
-      id: 2,
-      title: "Headphones",
-      price: 199,
-      image: "https://via.placeholder.com/200"
-    },
-    {
-      id: 3,
-      title: "Speaker",
-      price: 149,
-      image: "https://via.placeholder.com/200"
-    },
-    {
-      id: 4,
-      title: "Camera",
-      price: 499,
-      image: "https://via.placeholder.com/200"
-    }
-  ]
+  const { data, isLoading } = useProducts()
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-20">
+        Loading products...
+      </div>
+    )
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="text-center py-20">
+        No products available
+      </div>
+    )
+  }
 
   return (
 
@@ -39,13 +31,15 @@ export default function ProductGrid() {
 
       <div className="grid grid-cols-4 gap-6">
 
-        {products.map((p) => (
+        {data.map((product: any) => (
+
           <ProductCard
-            key={p.id}
-            title={p.title}
-            price={p.price}
-            image={p.image}
+            key={product.id}
+            title={product.title}
+            price={product.price}
+            image={product.image}
           />
+
         ))}
 
       </div>
