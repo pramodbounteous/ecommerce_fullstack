@@ -24,6 +24,12 @@ export default function Navbar() {
             </Button>
           </Link>
 
+          <Link to="/cart">
+            <Button variant="outline">
+              Cart
+            </Button>
+          </Link>
+
           <Link to="/register">
             <Button className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
               Register
