@@ -1,5 +1,13 @@
 import api from "@/lib/api"
 
+export const getCart = async () => {
+
+  const res = await api.get("/cart")
+
+  return res.data.data
+
+}
+
 export const addToCart = async (
   productId: number,
   quantity: number
@@ -11,12 +19,28 @@ export const addToCart = async (
   })
 
   return res.data
+
 }
 
-export const getCart = async () => {
+export const updateCartItem = async (
+  itemId: number,
+  quantity: number
+) => {
 
-  const res = await api.get("/cart")
+  const res = await api.patch(`/cart/${itemId}`, {
+    quantity
+  })
 
-  return res.data.data
+  return res.data
+
+}
+
+export const removeCartItem = async (
+  itemId: number
+) => {
+
+  const res = await api.delete(`/cart/${itemId}`)
+
+  return res.data
 
 }
