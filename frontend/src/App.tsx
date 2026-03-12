@@ -5,6 +5,8 @@ import RegisterPage from "./pages/RegisterPage"
 import HomePage from "./pages/HomePage"
 import ProductPage from "./pages/ProductPage"
 import CartPage from "./pages/CartPage"
+import CheckoutPage from "./pages/CheckoutPage"
+import OrdersPage from "./pages/OrdersPage"
 
 function App() {
 
@@ -23,6 +25,10 @@ function App() {
         <Route path="/products/:id" element={<ProductPage />} />
 
         <Route path="/cart" element={<CartPage />} />
+
+        <Route path="/checkout" element={<CheckoutPage />} />
+
+        <Route path="/orders" element={<OrdersPage />} />
 
       </Routes>
 
