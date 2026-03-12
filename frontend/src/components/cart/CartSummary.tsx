@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 
 interface Props {
   items: any[]
@@ -28,9 +29,11 @@ export default function CartSummary({ items }: Props) {
 
       </div>
 
-      <Button className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-        Checkout
-      </Button>
+      <Link to="/checkout">
+        <Button className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+         Checkout
+        </Button>
+      </Link>
 
     </div>
 
