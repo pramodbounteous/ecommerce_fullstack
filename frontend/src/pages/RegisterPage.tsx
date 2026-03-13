@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 import { registerUser } from "@/api/auth"
+import { useToast } from "@/components/providers/ToastProvider"
 
 export default function RegisterPage() {
 
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -18,13 +20,27 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    await registerUser({
-      name,
-      email,
-      password
-    })
+    try {
+      await registerUser({
+        name,
+        email,
+        password
+      })
 
-    navigate("/login")
+      toast({
+        title: "Account created",
+        description: "You can now sign in.",
+        variant: "success"
+      })
+
+      navigate("/login")
+    } catch {
+      toast({
+        title: "Registration failed",
+        description: "Please review your details and try again.",
+        variant: "error"
+      })
+    }
   }
 
   return (
@@ -58,7 +74,7 @@ export default function RegisterPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <Button className="w-full bg-slate-800 text-white">
+        <Button className="w-full">
           Register
         </Button>
 
@@ -68,7 +84,7 @@ export default function RegisterPage() {
         Already have an account?{" "}
         <Link
           to="/login"
-          className="text-purple-600 font-medium"
+          className="font-medium text-foreground"
         >
           Login
         </Link>

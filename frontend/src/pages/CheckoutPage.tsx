@@ -41,13 +41,13 @@ export default function CheckoutPage() {
 
   return (
 
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-muted/20">
 
       <Navbar />
 
        <main className="flex-grow">
 
-      <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 gap-10">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 md:px-6 lg:grid-cols-2">
 
         <div className="space-y-6">
 
@@ -65,7 +65,7 @@ export default function CheckoutPage() {
 
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow space-y-4 h-fit">
+        <div className="h-fit space-y-4 rounded-xl border bg-background p-6 shadow-sm">
 
           <h2 className="text-lg font-semibold">
             Order Summary
@@ -75,13 +75,13 @@ export default function CheckoutPage() {
 
             <span>Total</span>
 
-            <span>${total}</span>
+            <span>${total.toFixed(2)}</span>
 
           </div>
 
           <Button
             onClick={handleCheckout}
-            className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+            className="w-full"
           >
             Place Order
           </Button>

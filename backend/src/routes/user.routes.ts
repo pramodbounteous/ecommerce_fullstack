@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   profile,
+  editProfile,
   createAddress,
   listAddresses,
   editAddress,
@@ -10,6 +11,7 @@ import {
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import { addressSchema } from "../validators/address.schema";
+import { updateProfileSchema } from "../validators/user.schema";
 import { asyncHandler } from "../utils/asyncHandler";
 
 const router = Router();
@@ -18,6 +20,13 @@ router.get(
   "/me",
   authMiddleware,
   asyncHandler(profile)
+);
+
+router.patch(
+  "/me",
+  authMiddleware,
+  validate(updateProfileSchema),
+  asyncHandler(editProfile)
 );
 
 router.post(

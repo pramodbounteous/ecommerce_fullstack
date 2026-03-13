@@ -41,11 +41,14 @@ export default function CartItem({ item }: Props) {
 
   return (
 
-    <div className="flex gap-6 border-b py-6">
+    <div className="flex flex-col gap-4 rounded-xl border bg-background p-4 sm:flex-row sm:gap-6">
 
       <img
-        src={product.productImg}
-        className="w-24 h-24 object-cover rounded"
+        src={product.image}
+        className="h-24 w-24 rounded-lg object-cover"
+        onError={(event) => {
+          event.currentTarget.src = "https://placehold.co/200x200?text=Product"
+        }}
       />
 
       <div className="flex-1">
@@ -54,14 +57,14 @@ export default function CartItem({ item }: Props) {
           {product.title}
         </h3>
 
-        <p className="text-gray-500 text-sm">
-          ${product.price}
+        <p className="text-sm text-muted-foreground">
+          ${product.price.toFixed(2)}
         </p>
 
         <div className="flex items-center gap-3 mt-3">
 
           <button
-            className="px-3 py-1 border rounded"
+            className="rounded-lg border px-3 py-1"
             onClick={decreaseQty}
           >
             -
@@ -70,7 +73,7 @@ export default function CartItem({ item }: Props) {
           <span>{item.quantity}</span>
 
           <button
-            className="px-3 py-1 border rounded"
+            className="rounded-lg border px-3 py-1"
             onClick={increaseQty}
           >
             +
@@ -80,10 +83,10 @@ export default function CartItem({ item }: Props) {
 
       </div>
 
-      <div className="flex flex-col justify-between">
+      <div className="flex flex-row items-start justify-between gap-4 sm:flex-col sm:items-end">
 
         <p className="font-medium">
-          ${product.price * item.quantity}
+          ${(product.price * item.quantity).toFixed(2)}
         </p>
 
         <Button

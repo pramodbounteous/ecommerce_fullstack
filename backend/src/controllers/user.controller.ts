@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   getProfile,
+  updateProfile,
   addAddress,
   getAddresses,
   updateAddress,
@@ -12,6 +13,19 @@ export async function profile(req: Request, res: Response) {
   const user = (req as any).user;
 
   const result = await getProfile(user.userId);
+
+  res.json({
+    success: true,
+    data: result
+  });
+
+}
+
+export async function editProfile(req: Request, res: Response) {
+
+  const user = (req as any).user;
+
+  const result = await updateProfile(user.userId, req.body);
 
   res.json({
     success: true,

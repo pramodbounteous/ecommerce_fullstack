@@ -17,13 +17,13 @@ export default function OrdersPage() {
 
   return (
 
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-muted/20">
 
       <Navbar />
 
       <main className="flex-grow">
 
-      <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 md:px-6">
 
         <h1 className="text-2xl font-semibold">
           My Orders
@@ -31,7 +31,7 @@ export default function OrdersPage() {
 
         {orders.length === 0 && (
 
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             No orders yet
           </p>
 

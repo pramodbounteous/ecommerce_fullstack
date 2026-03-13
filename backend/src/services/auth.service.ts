@@ -7,6 +7,22 @@ import {
 } from "../utils/jwt";
 import { AppError } from "../utils/AppError";
 
+function serializeUser(user: {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: Date;
+}) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt
+  };
+}
+
 export async function registerUser(data: any) {
 
   const existing = await prisma.user.findUnique({
@@ -43,7 +59,11 @@ export async function registerUser(data: any) {
     }
   });
 
-  return { user, accessToken, refreshToken };
+  return {
+    user: serializeUser(user),
+    accessToken,
+    refreshToken
+  };
 }
 
 export async function loginUser(data: any) {
@@ -78,10 +98,17 @@ export async function loginUser(data: any) {
     }
   });
 
-  return { user, accessToken, refreshToken };
+  return {
+    user: serializeUser(user),
+    accessToken,
+    refreshToken
+  };
 }
 
 export async function refreshAccessToken(token: string) {
+  if (!token) {
+    throw new AppError("Refresh token is required", 401);
+  }
 
   const payload: any = verifyRefreshToken(token);
 
@@ -93,12 +120,38 @@ export async function refreshAccessToken(token: string) {
     throw new AppError("Invalid refresh token", 401);
   }
 
+  if (storedToken.expiresAt < new Date()) {
+    await prisma.refreshToken.delete({
+      where: { id: storedToken.id }
+    });
+    throw new AppError("Refresh token expired", 401);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true
+    }
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
   const newAccessToken = generateAccessToken({
     userId: payload.userId,
     role: payload.role
   });
 
-  return { accessToken: newAccessToken };
+  return {
+    user: serializeUser(user),
+    accessToken: newAccessToken,
+    refreshToken: token
+  };
 }
 
 export async function logoutUser(token: string) {

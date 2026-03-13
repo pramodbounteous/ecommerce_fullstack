@@ -32,7 +32,7 @@ export async function refreshToken(req: Request, res: Response) {
 
   const result = await refreshAccessToken(token);
 
-  res.json({
+  res.status(200).json({
     success: true,
     data: result
   });

@@ -15,7 +15,7 @@ export default function CartSummary({ items }: Props) {
 
   return (
 
-    <div className="bg-white p-6 rounded-xl shadow space-y-4">
+    <div className="h-fit space-y-4 rounded-xl border bg-background p-6 shadow-sm">
 
       <h2 className="text-lg font-semibold">
         Order Summary
@@ -25,15 +25,21 @@ export default function CartSummary({ items }: Props) {
 
         <span>Subtotal</span>
 
-        <span>${total}</span>
+        <span>${total.toFixed(2)}</span>
 
       </div>
 
-      <Link to="/checkout">
-        <Button className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-         Checkout
+      {items.length === 0 ? (
+        <Button className="w-full" disabled>
+          Checkout
         </Button>
-      </Link>
+      ) : (
+        <Link to="/checkout">
+          <Button className="w-full">
+            Checkout
+          </Button>
+        </Link>
+      )}
 
     </div>
 

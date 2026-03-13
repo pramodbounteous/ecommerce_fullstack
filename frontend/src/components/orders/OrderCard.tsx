@@ -6,7 +6,7 @@ export default function OrderCard({ order }: Props) {
 
   return (
 
-    <div className="bg-white p-6 rounded-xl shadow space-y-4">
+    <div className="space-y-4 rounded-xl border bg-background p-6 shadow-sm">
 
       <div className="flex justify-between">
 
@@ -26,16 +26,14 @@ export default function OrderCard({ order }: Props) {
 
           <div
             key={item.id}
-            className="flex justify-between text-sm"
+            className="flex justify-between gap-4 text-sm"
           >
 
             <span>
               {item.product.title} × {item.quantity}
             </span>
 
-            <span>
-              ${item.totalPrice}
-            </span>
+            <span>${item.totalPrice.toFixed(2)}</span>
 
           </div>
 

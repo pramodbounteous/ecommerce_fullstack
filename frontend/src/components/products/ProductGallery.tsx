@@ -6,11 +6,14 @@ export default function ProductGallery({ image }: Props) {
 
   return (
 
-    <div className="w-full flex justify-center">
+    <div className="flex w-full justify-center rounded-2xl border bg-background p-6">
 
       <img
         src={image}
-        className="w-[500px] h-[500px] object-contain"
+        className="aspect-square w-full max-w-[500px] object-contain"
+        onError={(event) => {
+          event.currentTarget.src = "https://placehold.co/600x600?text=Product"
+        }}
       />
 
     </div>
