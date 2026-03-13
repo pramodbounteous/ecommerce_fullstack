@@ -41,9 +41,11 @@ export default function CheckoutPage() {
 
   return (
 
-    <div>
+    <div className="min-h-screen flex flex-col">
 
       <Navbar />
+
+       <main className="flex-grow">
 
       <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 gap-10">
 
@@ -87,6 +89,8 @@ export default function CheckoutPage() {
         </div>
 
       </div>
+
+      </main>
 
       <Footer />
 
