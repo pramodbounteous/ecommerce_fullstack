@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { AxiosError } from "axios"
 
 import { checkout } from "@/api/orders"
 import { useToast } from "@/components/providers/ToastProvider"
@@ -32,10 +33,25 @@ export function useCheckout() {
       })
     },
 
-    onError: () => {
+    onError: (error) => {
+      const axiosError = error as AxiosError<{
+        message?: string
+        errors?: {
+          fieldErrors?: Record<string, string[]>
+        }
+      }>
+
+      const fieldErrors = axiosError.response?.data?.errors?.fieldErrors
+      const validationMessage = fieldErrors
+        ? Object.values(fieldErrors).flat().join(", ")
+        : null
+
       toast({
         title: "Checkout failed",
-        description: "Please verify your cart and shipping details.",
+        description:
+          axiosError.response?.data?.message ??
+          validationMessage ??
+          "Please verify your cart and shipping details.",
         variant: "error"
       })
     }

@@ -21,6 +21,11 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState("")
 
   const items = data?.items || []
+  const trimmedAddress = address.trim()
+  const canCheckout =
+    items.length > 0 &&
+    trimmedAddress.length >= 10 &&
+    !checkoutMutation.isPending
 
   const total = items.reduce(
     (acc: number, item: any) =>
@@ -29,10 +34,13 @@ export default function CheckoutPage() {
   )
 
   const handleCheckout = async () => {
+    if (!canCheckout) {
+      return
+    }
 
     await checkoutMutation.mutateAsync({
       paymentMethod: "COD",
-      shippingAddress: address
+      shippingAddress: trimmedAddress
     })
 
     navigate("/orders")
@@ -63,6 +71,10 @@ export default function CheckoutPage() {
             }
           />
 
+          <p className="text-sm text-muted-foreground">
+            Enter at least 10 characters for the shipping address.
+          </p>
+
         </div>
 
         <div className="h-fit space-y-4 rounded-xl border bg-background p-6 shadow-sm">
@@ -82,8 +94,9 @@ export default function CheckoutPage() {
           <Button
             onClick={handleCheckout}
             className="w-full"
+            disabled={!canCheckout}
           >
-            Place Order
+            {checkoutMutation.isPending ? "Placing Order..." : "Place Order"}
           </Button>
 
         </div>
