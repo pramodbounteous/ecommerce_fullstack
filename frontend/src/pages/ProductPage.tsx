@@ -20,9 +20,10 @@ export default function ProductPage() {
 
   return (
 
-    <div>
+    <div className="min-h-screen flex flex-col">
 
       <Navbar />
+      <main className="flex-grow">
 
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 gap-10">
 
@@ -36,6 +37,7 @@ export default function ProductPage() {
 />
 
       </div>
+      </main>
 
       <Footer />
 

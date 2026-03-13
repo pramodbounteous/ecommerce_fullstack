@@ -18,9 +18,10 @@ export default function CartPage() {
 
   return (
 
-    <div>
+    <div className="min-h-screen flex flex-col">
 
       <Navbar />
+        <main className="flex-grow">
 
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-3 gap-10">
 
@@ -44,6 +45,7 @@ export default function CartPage() {
         <CartSummary items={items} />
 
       </div>
+      </main>
 
       <Footer />
 
