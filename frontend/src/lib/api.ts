@@ -8,7 +8,7 @@ import {
 } from "@/lib/auth-storage"
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api"
+  baseURL: "https://ecommerce-fullstack-backend-ak7d.onrender.com/api"
 })
 
 let refreshPromise: Promise<string> | null = null
