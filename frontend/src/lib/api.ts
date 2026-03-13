@@ -7,8 +7,12 @@ import {
   setStoredSession
 } from "@/lib/auth-storage"
 
+const apiBaseUrl =
+  import.meta.env.VITE_API_URL ??
+  "https://ecommerce-fullstack-backend-ak7d.onrender.com/api"
+
 const api = axios.create({
-  baseURL: "https://ecommerce-fullstack-backend-ak7d.onrender.com/api",
+  baseURL: apiBaseUrl,
   withCredentials: true
 })
 
@@ -62,7 +66,7 @@ api.interceptors.response.use(
     try {
       if (!refreshPromise) {
         refreshPromise = axios
-          .post("http://localhost:5000/api/auth/refresh", { refreshToken })
+          .post(`${apiBaseUrl}/auth/refresh`, { refreshToken }, { withCredentials: true })
           .then((response) => {
             const session = response.data.data
             setStoredSession(session)
