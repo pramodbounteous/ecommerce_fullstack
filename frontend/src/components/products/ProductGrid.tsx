@@ -38,7 +38,7 @@ export default function ProductGrid() {
             id={product.id}
             title={product.title}
             price={product.price}
-            image={product.productImg}
+            image={product.image}
           />
 
         ))}
