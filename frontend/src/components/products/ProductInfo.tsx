@@ -31,32 +31,31 @@ export default function ProductInfo({
 
     <div className="space-y-6">
 
-      <h1 className="text-3xl font-semibold">
+      <h1 className="text-3xl font-semibold tracking-tight">
         {title}
       </h1>
 
-      <p className="text-xl font-medium text-gray-700">
-        ${price}
+      <p className="text-2xl font-semibold text-foreground">
+        ${price.toFixed(2)}
       </p>
 
-      <p className="text-gray-500 leading-relaxed max-w-md">
+      <p className="max-w-xl leading-relaxed text-muted-foreground">
         {description}
       </p>
 
-      {/* Quantity selector */}
       <div className="flex items-center gap-4">
 
         <button
-          className="px-3 py-1 border rounded"
+          className="rounded-lg border px-3 py-2"
           onClick={() => setQty(Math.max(1, qty - 1))}
         >
           -
         </button>
 
-        <span>{qty}</span>
+        <span className="min-w-8 text-center font-medium">{qty}</span>
 
         <button
-          className="px-3 py-1 border rounded"
+          className="rounded-lg border px-3 py-2"
           onClick={() => setQty(qty + 1)}
         >
           +
@@ -64,10 +63,9 @@ export default function ProductInfo({
 
       </div>
 
-      {/* Add to Cart */}
       <Button
         onClick={handleAdd}
-        className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+        className="w-full sm:w-auto"
       >
         Add to Cart
       </Button>

@@ -1,11 +1,22 @@
-import { useQuery } from "@tanstack/react-query"
-import { getProducts } from "@/api/products"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 
-export function useProducts() {
+import { getFeaturedProducts, getProducts } from "@/api/products"
 
-  return useQuery({
-    queryKey: ["products"],
-    queryFn: getProducts
+export function useInfiniteProducts(search: string) {
+  return useInfiniteQuery({
+    queryKey: ["products", search],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => getProducts({ pageParam, search }),
+    getNextPageParam: (lastPage) => {
+      const loadedCount = lastPage.page * lastPage.limit
+      return loadedCount < lastPage.total ? lastPage.page + 1 : undefined
+    }
   })
+}
 
+export function useFeaturedProducts() {
+  return useQuery({
+    queryKey: ["featured-products"],
+    queryFn: getFeaturedProducts
+  })
 }

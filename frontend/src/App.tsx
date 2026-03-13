@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
+import ProtectedRoute from "./components/auth/ProtectedRoute"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import HomePage from "./pages/HomePage"
@@ -7,6 +8,7 @@ import ProductPage from "./pages/ProductPage"
 import CartPage from "./pages/CartPage"
 import CheckoutPage from "./pages/CheckoutPage"
 import OrdersPage from "./pages/OrdersPage"
+import ProfilePage from "./pages/ProfilePage"
 
 function App() {
 
@@ -24,11 +26,12 @@ function App() {
 
         <Route path="/products/:id" element={<ProductPage />} />
 
-        <Route path="/cart" element={<CartPage />} />
-
-        <Route path="/checkout" element={<CheckoutPage />} />
-
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
 
       </Routes>
 

@@ -16,6 +16,37 @@ export async function getProfile(userId: number) {
 
 }
 
+export async function updateProfile(userId: number, data: {
+  name: string;
+  email: string;
+}) {
+  const existing = await prisma.user.findFirst({
+    where: {
+      email: data.email,
+      NOT: { id: userId }
+    }
+  });
+
+  if (existing) {
+    throw new AppError("Email already exists", 400);
+  }
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: data.name,
+      email: data.email
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true
+    }
+  });
+}
+
 export async function addAddress(userId: number, data: any) {
 
   return prisma.address.create({

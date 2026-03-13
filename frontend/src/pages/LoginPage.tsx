@@ -1,17 +1,27 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import AuthCard from "@/components/ui/auth/AuthCard"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 import { loginUser } from "@/api/auth"
+import { useToast } from "@/components/providers/ToastProvider"
 import { useAuth } from "@/context/AuthContext"
 
 export default function LoginPage() {
 
   const navigate = useNavigate()
+  const location = useLocation()
   const { login } = useAuth()
+  const { toast } = useToast()
+  const redirectTo =
+    typeof location.state === "object" &&
+    location.state !== null &&
+    "from" in location.state &&
+    typeof location.state.from === "string"
+      ? location.state.from
+      : "/"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -19,14 +29,27 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const res = await loginUser({
-      email,
-      password
-    })
+    try {
+      const session = await loginUser({
+        email,
+        password
+      })
 
-    login(res.data.accessToken)
+      login(session)
+      toast({
+        title: "Login successful",
+        description: "You are now signed in.",
+        variant: "success"
+      })
 
-    navigate("/")
+      navigate(redirectTo)
+    } catch {
+      toast({
+        title: "Login failed",
+        description: "Check your email and password and try again.",
+        variant: "error"
+      })
+    }
   }
 
   return (
@@ -54,7 +77,7 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <Button className="w-full bg-slate-800 text-white">
+        <Button className="w-full">
           Continue
         </Button>
 
@@ -64,7 +87,7 @@ export default function LoginPage() {
         Don't have an account?{" "}
         <Link
           to="/register"
-          className="text-purple-600 font-medium"
+          className="font-medium text-foreground"
         >
           Register
         </Link>
