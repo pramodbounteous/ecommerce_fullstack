@@ -21,12 +21,10 @@ export default function ProductInfo({
   const { mutate } = useAddToCart()
 
   const handleAdd = () => {
-
     mutate({
       productId: id,
       quantity: qty
     })
-
   }
 
   return (
@@ -41,10 +39,11 @@ export default function ProductInfo({
         ${price}
       </p>
 
-      <p className="text-gray-500">
+      <p className="text-gray-500 leading-relaxed max-w-md">
         {description}
       </p>
 
+      {/* Quantity selector */}
       <div className="flex items-center gap-4">
 
         <button
@@ -65,6 +64,7 @@ export default function ProductInfo({
 
       </div>
 
+      {/* Add to Cart */}
       <Button
         onClick={handleAdd}
         className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
@@ -75,5 +75,4 @@ export default function ProductInfo({
     </div>
 
   )
-
 }

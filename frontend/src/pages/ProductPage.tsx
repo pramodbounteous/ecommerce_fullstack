@@ -20,24 +20,22 @@ export default function ProductPage() {
 
   return (
 
-    <div className="min-h-screen flex flex-col">
+    <div>
 
       <Navbar />
-      <main className="flex-grow">
 
-      <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 gap-10">
+      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 gap-20 items-center">
 
-        <ProductGallery image={data.productImg} />
+        <ProductGallery image={data.image} />
 
         <ProductInfo
-            id={data.id}
-            title={data.title}
-            price={data.price}
-            description={data.description}
-/>
+          id={data.id}
+          title={data.title}
+          price={data.price}
+          description={data.description}
+        />
 
       </div>
-      </main>
 
       <Footer />
 

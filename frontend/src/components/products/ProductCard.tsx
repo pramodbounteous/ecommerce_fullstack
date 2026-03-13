@@ -18,30 +18,44 @@ export default function ProductCard({
 
   return (
 
-    <Link to={`/products/${id}`}>
+    <Card className="p-4 space-y-3 hover:shadow-lg transition">
 
-  <Card className="p-4 space-y-3">
+      <Link to={`/products/${id}`}>
 
-    <img
-      src={image}
-      className="h-40 w-full object-cover rounded"
-    />
+        <img
+          src={image}
+          alt={title}
+          className="h-40 w-full object-cover rounded"
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://placehold.co/400x400?text=Product"
+          }}
+        />
 
-    <h3 className="font-medium">
-      {title}
-    </h3>
+      </Link>
 
-    <p className="text-gray-500">
-      ${price}
-    </p>
+      <Link to={`/products/${id}`}>
 
-    <Button className="w-full bg-slate-800 text-white">
-      Add to Cart
-    </Button>
+        <h3 className="font-medium hover:underline">
+          {title}
+        </h3>
 
-  </Card>
+      </Link>
 
-</Link>
+      <p className="text-gray-500">
+        ${price}
+      </p>
+
+      <Button
+        className="w-full bg-slate-800 text-white"
+        onClick={(e) => {
+          e.preventDefault()
+        }}
+      >
+        Add to Cart
+      </Button>
+
+    </Card>
 
   )
 }
