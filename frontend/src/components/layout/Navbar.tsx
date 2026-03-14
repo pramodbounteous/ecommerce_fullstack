@@ -5,14 +5,17 @@ import { Link, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/AuthContext"
+import { useCart } from "@/hooks/useCart"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const { isAuthenticated, logout } = useAuth()
+  const { data: cart } = useCart(isAuthenticated)
   const location = useLocation()
 
   const closeMenu = () => setIsOpen(false)
   const isActive = (path: string) => location.pathname === path
+  const cartCount = (cart?.items ?? []).reduce((total, item) => total + item.quantity, 0)
 
   return (
     <nav className="sticky top-0 z-40 border-b border-white/70 bg-background/80 backdrop-blur-xl">
@@ -52,6 +55,16 @@ export default function Navbar() {
               <Button variant={isActive("/cart") ? "default" : "outline"} className="rounded-full px-4">
                 <ShoppingCart className="size-4" />
                 Cart
+                {cartCount > 0 ? (
+                  <span className={cn(
+                    "ml-1 inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold",
+                    isActive("/cart")
+                      ? "bg-white/20 text-white"
+                      : "bg-primary text-primary-foreground"
+                  )}>
+                    {cartCount}
+                  </span>
+                ) : null}
               </Button>
             </Link>
 
@@ -122,6 +135,11 @@ export default function Navbar() {
                 <Button variant="ghost" className="w-full justify-start rounded-xl px-4 py-5">
                   <ShoppingCart className="size-4" />
                   Cart
+                  {cartCount > 0 ? (
+                    <span className="ml-auto inline-flex min-w-6 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-xs font-semibold text-primary-foreground">
+                      {cartCount}
+                    </span>
+                  ) : null}
                 </Button>
               </Link>
               {isAuthenticated ? (

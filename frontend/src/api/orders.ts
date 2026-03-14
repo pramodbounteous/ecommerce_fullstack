@@ -10,6 +10,9 @@ export interface OrderItem {
 
 export interface Order {
   id: number
+  paymentMethod: string
+  shippingAddress: string
+  expectedDelivery: string
   createdAt: string
   items: OrderItem[]
 }

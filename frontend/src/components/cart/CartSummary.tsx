@@ -8,6 +8,9 @@ interface Props {
 }
 
 export default function CartSummary({ items }: Props) {
+  const unavailableItems = items.filter(
+    (item) => item.product.stock <= 0 || item.quantity > item.product.stock
+  )
   const total = items.reduce(
     (acc, item) =>
       acc + item.product.price * item.quantity,
@@ -46,13 +49,17 @@ export default function CartSummary({ items }: Props) {
       <div className="rounded-2xl border border-dashed bg-white/70 p-4 text-sm text-muted-foreground">
         <div className="flex items-start gap-3">
           <ShieldCheck className="mt-0.5 size-4 text-primary" />
-          <p>Review your subtotal before placing the order.</p>
+          <p>
+            {unavailableItems.length > 0
+              ? "Some items are not in stock. Update your cart before checkout."
+              : "Review your subtotal before placing the order."}
+          </p>
         </div>
       </div>
 
-      {items.length === 0 ? (
+      {items.length === 0 || unavailableItems.length > 0 ? (
         <Button className="w-full rounded-xl py-6" disabled>
-          Checkout
+          {unavailableItems.length > 0 ? "Unavailable Items in Cart" : "Checkout"}
         </Button>
       ) : (
         <Link to="/checkout">

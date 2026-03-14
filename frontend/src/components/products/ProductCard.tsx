@@ -20,9 +20,11 @@ export default function ProductCard({
   title,
   price,
   image,
-  description
+  description,
+  stock = 0
 }: Props) {
   const { mutate, isPending } = useAddToCart()
+  const isOutOfStock = stock <= 0
 
   return (
     <Card className="h-full border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.55)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-32px_rgba(37,99,235,0.28)]">
@@ -42,7 +44,7 @@ export default function ProductCard({
         <div className="flex items-center justify-between gap-3 pt-1">
           <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-foreground">
             <Sparkles className="size-3" />
-            Ready to ship
+            {isOutOfStock ? "Not in stock" : `${stock} in stock`}
           </span>
           <p className="text-lg font-semibold text-foreground">${price.toFixed(2)}</p>
         </div>
@@ -66,10 +68,10 @@ export default function ProductCard({
                 quantity: 1
               })
             }}
-            disabled={isPending}
+            disabled={isPending || isOutOfStock}
           >
             <ShoppingCart className="size-4" />
-            {isPending ? "Adding..." : "Add to Cart"}
+            {isOutOfStock ? "Not in Stock" : isPending ? "Adding..." : "Add to Cart"}
           </Button>
           <Button asChild variant="outline" className="rounded-xl bg-white">
             <Link to={`/products/${id}`}>

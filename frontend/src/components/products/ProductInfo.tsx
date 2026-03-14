@@ -9,18 +9,25 @@ interface Props {
   title: string
   price: number
   description: string
+  stock: number
 }
 
 export default function ProductInfo({
   id,
   title,
   price,
-  description
+  description,
+  stock
 }: Props) {
   const [qty, setQty] = useState(1)
   const { mutate, isPending } = useAddToCart()
+  const isOutOfStock = stock <= 0
 
   const handleAdd = () => {
+    if (isOutOfStock) {
+      return
+    }
+
     mutate({
       productId: id,
       quantity: qty
@@ -39,7 +46,7 @@ export default function ProductInfo({
             ${price.toFixed(2)}
           </p>
           <span className="rounded-full bg-accent px-3 py-1 text-sm font-medium text-accent-foreground">
-            In demand
+            {isOutOfStock ? "Not in stock" : `${stock} available`}
           </span>
         </div>
       </div>
@@ -71,6 +78,7 @@ export default function ProductInfo({
             className="rounded-full p-2 text-foreground transition hover:bg-muted"
             onClick={() => setQty(Math.max(1, qty - 1))}
             aria-label="Decrease quantity"
+            disabled={isOutOfStock}
           >
             <Minus className="size-4" />
           </button>
@@ -79,8 +87,9 @@ export default function ProductInfo({
 
           <button
             className="rounded-full p-2 text-foreground transition hover:bg-muted"
-            onClick={() => setQty(qty + 1)}
+            onClick={() => setQty(Math.min(stock, qty + 1))}
             aria-label="Increase quantity"
+            disabled={isOutOfStock || qty >= stock}
           >
             <Plus className="size-4" />
           </button>
@@ -89,10 +98,10 @@ export default function ProductInfo({
         <Button
           onClick={handleAdd}
           className="w-full rounded-xl py-6 sm:w-auto sm:min-w-48"
-          disabled={isPending}
+          disabled={isPending || isOutOfStock}
         >
           <ShoppingCart className="size-4" />
-          {isPending ? "Adding..." : "Add to Cart"}
+          {isOutOfStock ? "Not in Stock" : isPending ? "Adding..." : "Add to Cart"}
         </Button>
       </div>
     </div>

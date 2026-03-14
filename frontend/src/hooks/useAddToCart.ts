@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { AxiosError } from "axios"
+
 import { addToCart } from "@/api/cart"
 import { useToast } from "@/components/providers/ToastProvider"
 
@@ -26,10 +28,13 @@ export function useAddToCart() {
         variant: "success"
       })
     },
-    onError: () => {
+    onError: (error) => {
+      const axiosError = error as AxiosError<{ message?: string }>
+
       toast({
         title: "Could not add item",
-        description: "Please try again.",
+        description:
+          axiosError.response?.data?.message ?? "Please try again.",
         variant: "error"
       })
     }

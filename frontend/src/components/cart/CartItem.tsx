@@ -11,11 +11,14 @@ interface Props {
 
 export default function CartItem({ item }: Props) {
   const product = item.product
+  const isOutOfStock = product.stock <= 0 || item.quantity > product.stock
+  const canIncrease = item.quantity < product.stock
 
   const updateMutation = useUpdateCartItem()
   const removeMutation = useRemoveCartItem()
 
   const increaseQty = () => {
+    if (!canIncrease) return
 
     updateMutation.mutate({
       itemId: item.id,
@@ -61,6 +64,13 @@ export default function CartItem({ item }: Props) {
             <p className="text-sm text-muted-foreground">
               ${product.price.toFixed(2)} each
             </p>
+            <p className={`mt-1 text-xs font-medium ${isOutOfStock ? "text-destructive" : "text-muted-foreground"}`}>
+              {product.stock <= 0
+                ? "Not in stock"
+                : item.quantity > product.stock
+                  ? `Only ${product.stock} left in stock`
+                  : `${product.stock} available`}
+            </p>
           </div>
           <p className="font-medium sm:hidden">
             ${(product.price * item.quantity).toFixed(2)}
@@ -72,6 +82,7 @@ export default function CartItem({ item }: Props) {
             className="rounded-full p-2 transition hover:bg-muted"
             onClick={decreaseQty}
             aria-label="Decrease quantity"
+            disabled={updateMutation.isPending}
           >
             <Minus className="size-4" />
           </button>
@@ -82,6 +93,7 @@ export default function CartItem({ item }: Props) {
             className="rounded-full p-2 transition hover:bg-muted"
             onClick={increaseQty}
             aria-label="Increase quantity"
+            disabled={updateMutation.isPending || !canIncrease}
           >
             <Plus className="size-4" />
           </button>

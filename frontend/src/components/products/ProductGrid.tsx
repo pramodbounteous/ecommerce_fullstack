@@ -51,7 +51,13 @@ export default function ProductGrid() {
           </div>
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search products" className="h-11 rounded-xl border-white/70 bg-white pl-9 shadow-sm" disabled />
+            <Input
+              value=""
+              placeholder="Search products"
+              className="h-11 rounded-xl border-white/70 bg-white pl-9 shadow-sm"
+              disabled
+              readOnly
+            />
           </div>
         </div>
         <ProductGridSkeleton />

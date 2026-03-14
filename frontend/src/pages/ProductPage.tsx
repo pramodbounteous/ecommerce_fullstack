@@ -57,6 +57,7 @@ export default function ProductPage() {
           title={data.title}
           price={data.price}
           description={data.description}
+          stock={data.stock}
         />
         </div>
       </div>

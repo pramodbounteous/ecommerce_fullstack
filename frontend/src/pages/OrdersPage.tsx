@@ -17,7 +17,7 @@ export default function OrdersPage() {
         <main className="page-section py-8 md:py-10">
           <div className="mb-8">
             <p className="section-kicker">Orders</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Your order history</h1>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Review your order history.</h1>
           </div>
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, index) => (
@@ -44,9 +44,9 @@ export default function OrdersPage() {
           <div>
             <p className="section-kicker">Orders</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-              Your order history
+              Review your order history.
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">Track your recent purchases and past orders in one place.</p>
+            <p className="mt-2 text-sm text-muted-foreground">See delivery details, order totals, and the items in each purchase.</p>
           </div>
 
         {orders.length === 0 && (

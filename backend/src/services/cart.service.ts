@@ -38,8 +38,12 @@ export async function addToCart(userId: number, productId: number, quantity: num
     throw new AppError("Product not found", 404);
   }
 
+  if (product.stock <= 0) {
+    throw new AppError("Not in stock", 400);
+  }
+
   if (product.stock < quantity) {
-    throw new AppError("Not enough stock", 400);
+    throw new AppError(`Not enough stock. Only ${product.stock} left.`, 400);
   }
 
   let cart = await prisma.cart.findUnique({
@@ -62,11 +66,21 @@ export async function addToCart(userId: number, productId: number, quantity: num
   });
 
   if (existingItem) {
+    const nextQuantity = existingItem.quantity + quantity
+
+    if (product.stock < nextQuantity) {
+      throw new AppError(
+        product.stock <= 0
+          ? "Not in stock"
+          : `Not enough stock. Only ${product.stock} available.`,
+        400
+      );
+    }
 
     return prisma.cartItem.update({
       where: { id: existingItem.id },
       data: {
-        quantity: existingItem.quantity + quantity
+        quantity: nextQuantity
       }
     });
 
@@ -85,6 +99,28 @@ export async function updateCartItem(itemId: number, quantity: number) {
 
   if (quantity <= 0) {
     throw new AppError("Quantity must be greater than zero", 400);
+  }
+
+  const item = await prisma.cartItem.findUnique({
+    where: { id: itemId },
+    include: {
+      product: true
+    }
+  });
+
+  if (!item) {
+    throw new AppError("Cart item not found", 404);
+  }
+
+  if (item.product.stock <= 0) {
+    throw new AppError("Not in stock", 400);
+  }
+
+  if (item.product.stock < quantity) {
+    throw new AppError(
+      `Not enough stock. Only ${item.product.stock} available.`,
+      400
+    );
   }
 
   return prisma.cartItem.update({
