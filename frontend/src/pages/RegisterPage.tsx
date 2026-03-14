@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import AuthCard from "@/components/ui/auth/AuthCard"
+import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
@@ -9,7 +10,6 @@ import { registerUser } from "@/api/auth"
 import { useToast } from "@/components/providers/ToastProvider"
 
 export default function RegisterPage() {
-
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -44,53 +44,63 @@ export default function RegisterPage() {
   }
 
   return (
-
     <AuthCard
       title="Create account"
-      subtitle="Sign up to start shopping"
+      subtitle="Set up your account to save orders and shop faster"
     >
-
       <form
         onSubmit={handleSubmit}
         className="space-y-4"
       >
+        <div className="space-y-2">
+          <Label htmlFor="register-name">Name</Label>
+          <Input
+            id="register-name"
+            placeholder="Your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-11 rounded-xl bg-white"
+          />
+        </div>
 
-        <Input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="register-email">Email</Label>
+          <Input
+            id="register-email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-11 rounded-xl bg-white"
+          />
+        </div>
 
-        <Input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="register-password">Password</Label>
+          <Input
+            id="register-password"
+            type="password"
+            placeholder="Create a secure password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-11 rounded-xl bg-white"
+          />
+        </div>
 
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <Button className="w-full">
+        <Button className="h-11 w-full rounded-xl">
           Register
         </Button>
-
       </form>
 
-      <p className="text-sm text-center text-gray-500">
+      <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
           to="/login"
-          className="font-medium text-foreground"
+          className="font-medium text-foreground hover:text-primary"
         >
           Login
         </Link>
       </p>
-
     </AuthCard>
-
   )
 }

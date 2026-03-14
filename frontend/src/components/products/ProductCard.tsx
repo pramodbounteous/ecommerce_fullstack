@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 import type { MouseEvent } from "react"
+import { ArrowRight, ShoppingCart, Sparkles } from "lucide-react"
 
 import { useAddToCart } from "@/hooks/useAddToCart"
 
@@ -18,57 +19,65 @@ export default function ProductCard({
   id,
   title,
   price,
-  image
+  image,
+  description
 }: Props) {
   const { mutate, isPending } = useAddToCart()
 
   return (
-
-    <Card className="h-full border-border/70 py-0 transition duration-200 hover:-translate-y-1 hover:shadow-xl">
-
-      <Link to={`/products/${id}`} className="block overflow-hidden rounded-t-xl bg-muted/20">
-
+    <Card className="h-full border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.55)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-32px_rgba(37,99,235,0.28)]">
+      <Link to={`/products/${id}`} className="group block overflow-hidden rounded-t-xl bg-[linear-gradient(180deg,rgba(226,232,240,0.7),rgba(255,255,255,0.95))]">
         <img
           src={image}
           alt={title}
-          className="aspect-square w-full object-cover transition duration-300 hover:scale-[1.03]"
+          className="aspect-[1/0.92] w-full object-contain p-6 transition duration-500 group-hover:scale-[1.04]"
           onError={(e) => {
             e.currentTarget.src =
               "https://placehold.co/400x400?text=Product"
           }}
         />
-
       </Link>
 
-      <div className="space-y-3 px-4 pb-4">
-      <Link to={`/products/${id}`}>
+      <div className="space-y-4 px-5 pb-5">
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-foreground">
+            <Sparkles className="size-3" />
+            Ready to ship
+          </span>
+          <p className="text-lg font-semibold text-foreground">${price.toFixed(2)}</p>
+        </div>
 
-        <h3 className="line-clamp-2 text-base font-medium tracking-tight hover:underline">
-          {title}
-        </h3>
+        <Link to={`/products/${id}`} className="block space-y-2">
+          <h3 className="line-clamp-2 text-base font-semibold tracking-tight hover:text-primary">
+            {title}
+          </h3>
+          <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
+            {description ?? "Shop a standout pick chosen for everyday style and value."}
+          </p>
+        </Link>
 
-      </Link>
-
-      <p className="text-sm font-semibold text-foreground">
-        ${price.toFixed(2)}
-      </p>
-
-      <Button
-        className="w-full"
-        onClick={(e: MouseEvent<HTMLButtonElement>) => {
-          e.preventDefault()
-          mutate({
-            productId: id,
-            quantity: 1
-          })
-        }}
-        disabled={isPending}
-      >
-        {isPending ? "Adding..." : "Add to Cart"}
-      </Button>
+        <div className="flex gap-2">
+          <Button
+            className="flex-1 rounded-xl"
+            onClick={(e: MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault()
+              mutate({
+                productId: id,
+                quantity: 1
+              })
+            }}
+            disabled={isPending}
+          >
+            <ShoppingCart className="size-4" />
+            {isPending ? "Adding..." : "Add to Cart"}
+          </Button>
+          <Button asChild variant="outline" className="rounded-xl bg-white">
+            <Link to={`/products/${id}`}>
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
-
     </Card>
-
   )
 }

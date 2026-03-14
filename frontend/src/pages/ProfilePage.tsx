@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query"
 
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
+import type { Order } from "@/api/orders"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -40,11 +41,16 @@ export default function ProfilePage() {
   const recentOrders = orders.slice(0, 3)
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/20">
+    <div className="page-shell flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        <section className="mx-auto grid max-w-6xl gap-6 px-4 py-8 md:px-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card className="border-border/70 py-0">
+        <section className="page-section py-8 md:py-10">
+          <div className="mb-8">
+            <p className="section-kicker">Profile</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Manage your account</h1>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card className="border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.45)]">
             <CardHeader className="border-b bg-background/80 py-5">
               <CardTitle className="text-xl">My Profile</CardTitle>
             </CardHeader>
@@ -52,12 +58,13 @@ export default function ProfilePage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Name</p>
-                  <Input value={name} onChange={(event) => setName(event.target.value)} />
+                  <Input className="h-11 rounded-xl bg-white" value={name} onChange={(event) => setName(event.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
                   <Input
                     type="email"
+                    className="h-11 rounded-xl bg-white"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                   />
@@ -78,7 +85,7 @@ export default function ProfilePage() {
                 </div>
               </div>
               <Button
-                className="w-full sm:w-auto"
+                className="w-full rounded-xl sm:w-auto"
                 onClick={() => mutation.mutate({ name, email })}
                 disabled={mutation.isPending}
               >
@@ -87,7 +94,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/70 py-0">
+          <Card className="border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.45)]">
             <CardHeader className="border-b bg-background/80 py-5">
               <CardTitle className="text-xl">Recent Orders</CardTitle>
             </CardHeader>
@@ -95,8 +102,8 @@ export default function ProfilePage() {
               {recentOrders.length === 0 ? (
                 <p className="text-sm text-muted-foreground">You have not placed any orders yet.</p>
               ) : (
-                recentOrders.map((order: any) => (
-                  <div key={order.id} className="rounded-xl border p-4">
+                recentOrders.map((order: Order) => (
+                  <div key={order.id} className="rounded-2xl border bg-white/70 p-4">
                     <div className="flex items-center justify-between gap-4">
                       <p className="font-medium">Order #{order.id}</p>
                       <p className="text-xs text-muted-foreground">
@@ -111,6 +118,7 @@ export default function ProfilePage() {
               )}
             </CardContent>
           </Card>
+          </div>
         </section>
       </main>
       <Footer />

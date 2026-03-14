@@ -42,15 +42,16 @@ export default function ProductGrid() {
 
   if (isLoading) {
     return (
-      <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section id="catalog" className="page-section py-8 pb-12 md:py-10 md:pb-16">
+        <div className="section-panel mb-6 flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">All Products</h2>
-            <p className="text-sm text-muted-foreground">Browse the full catalog with live search.</p>
+            <p className="section-kicker">Catalog</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Browse the full collection</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Responsive search and infinite browsing, optimized for product discovery.</p>
           </div>
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search products" className="pl-9" disabled />
+            <Input placeholder="Search products" className="h-11 rounded-xl border-white/70 bg-white pl-9 shadow-sm" disabled />
           </div>
         </div>
         <ProductGridSkeleton />
@@ -60,12 +61,13 @@ export default function ProductGrid() {
 
   return (
 
-    <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <section id="catalog" className="page-section py-8 pb-12 md:py-10 md:pb-16">
+      <div className="section-panel mb-6 flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">All Products</h2>
+          <p className="section-kicker">Catalog</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Browse the full collection</h2>
           <p className="text-sm text-muted-foreground">
-            Browse the full catalog with live search.
+            {products.length} product{products.length === 1 ? "" : "s"} surfaced with live search.
           </p>
         </div>
         <div className="relative w-full sm:max-w-sm">
@@ -74,18 +76,18 @@ export default function ProductGrid() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search products"
-            className="pl-9"
+            className="h-11 rounded-xl border-white/70 bg-white pl-9 shadow-sm"
           />
         </div>
       </div>
 
       {products.length === 0 ? (
-        <div className="rounded-xl border border-dashed py-16 text-center text-muted-foreground">
-          No products found.
+        <div className="section-panel rounded-[1.75rem] border-dashed py-16 text-center text-muted-foreground">
+          No products found. Try a broader search term.
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
