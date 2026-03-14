@@ -1,15 +1,51 @@
-import { useState } from "react"
+import { MapPinHouse, Pencil, Plus, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
+import type { Order } from "@/api/orders"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 import { updateProfile } from "@/api/users"
 import { useOrders } from "@/hooks/useOrders"
 import { useToast } from "@/components/providers/ToastProvider"
+import {
+  getSavedAddresses,
+  removeSavedAddress,
+  saveAddress,
+  type SavedAddress
+} from "@/lib/saved-addresses"
+
+interface AddressFormState {
+  id?: string
+  label: string
+  fullName: string
+  email: string
+  phone: string
+  addressLine1: string
+  addressLine2: string
+  city: string
+  state: string
+  country: string
+  pincode: string
+}
+
+const emptyAddressForm: AddressFormState = {
+  label: "",
+  fullName: "",
+  email: "",
+  phone: "",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  state: "",
+  country: "India",
+  pincode: ""
+}
 
 export default function ProfilePage() {
   const { user, setUser } = useAuth()
@@ -17,6 +53,12 @@ export default function ProfilePage() {
   const { data: orders = [] } = useOrders()
   const [name, setName] = useState(user?.name ?? "")
   const [email, setEmail] = useState(user?.email ?? "")
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const [addressForm, setAddressForm] = useState<AddressFormState>({
+    ...emptyAddressForm,
+    fullName: user?.name ?? "",
+    email: user?.email ?? ""
+  })
 
   const mutation = useMutation({
     mutationFn: updateProfile,
@@ -38,13 +80,124 @@ export default function ProfilePage() {
   })
 
   const recentOrders = orders.slice(0, 3)
+  const hasAddressDraft =
+    addressForm.label.trim().length > 0 ||
+    addressForm.addressLine1.trim().length > 0 ||
+    addressForm.city.trim().length > 0
+
+  useEffect(() => {
+    if (!user?.id) {
+      return
+    }
+
+    setSavedAddresses(getSavedAddresses(user.id))
+    setAddressForm((current) => ({
+      ...current,
+      fullName: user.name,
+      email: user.email
+    }))
+  }, [user?.email, user?.id, user?.name])
+
+  const updateAddressForm = <K extends keyof AddressFormState>(key: K, value: AddressFormState[K]) => {
+    setAddressForm((current) => ({
+      ...current,
+      [key]: value
+    }))
+  }
+
+  const resetAddressForm = () => {
+    setAddressForm({
+      ...emptyAddressForm,
+      fullName: user?.name ?? "",
+      email: user?.email ?? ""
+    })
+  }
+
+  const handleSaveAddress = () => {
+    if (!user?.id) {
+      return
+    }
+
+    if (
+      addressForm.label.trim().length < 2 ||
+      addressForm.fullName.trim().length < 2 ||
+      addressForm.phone.trim().length < 10 ||
+      addressForm.addressLine1.trim().length < 5 ||
+      addressForm.city.trim().length < 2 ||
+      addressForm.state.trim().length < 2 ||
+      addressForm.country.trim().length < 2 ||
+      addressForm.pincode.trim().length < 4
+    ) {
+      toast({
+        title: "Address incomplete",
+        description: "Fill in all required delivery address fields before saving.",
+        variant: "error"
+      })
+      return
+    }
+
+    const nextAddresses = saveAddress(user.id, {
+      id: addressForm.id ?? `${Date.now()}`,
+      label: addressForm.label.trim(),
+      fullName: addressForm.fullName.trim(),
+      email: addressForm.email.trim(),
+      phone: addressForm.phone.trim(),
+      addressLine1: addressForm.addressLine1.trim(),
+      addressLine2: addressForm.addressLine2.trim(),
+      city: addressForm.city.trim(),
+      state: addressForm.state.trim(),
+      country: addressForm.country.trim(),
+      pincode: addressForm.pincode.trim()
+    })
+
+    setSavedAddresses(nextAddresses)
+    resetAddressForm()
+    toast({
+      title: addressForm.id ? "Address updated" : "Address saved",
+      description: "Your delivery address is ready for checkout.",
+      variant: "success"
+    })
+  }
+
+  const handleEditAddress = (address: SavedAddress) => {
+    setAddressForm({
+      id: address.id,
+      label: address.label,
+      fullName: address.fullName,
+      email: address.email,
+      phone: address.phone,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2 ?? "",
+      city: address.city,
+      state: address.state,
+      country: address.country,
+      pincode: address.pincode
+    })
+  }
+
+  const handleRemoveAddress = (addressId: string) => {
+    if (!user?.id) {
+      return
+    }
+
+    setSavedAddresses(removeSavedAddress(user.id, addressId))
+
+    if (addressForm.id === addressId) {
+      resetAddressForm()
+    }
+  }
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/20">
+    <div className="page-shell flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        <section className="mx-auto grid max-w-6xl gap-6 px-4 py-8 md:px-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card className="border-border/70 py-0">
+        <section className="page-section py-8 md:py-10">
+          <div className="mb-8">
+            <p className="section-kicker">Profile</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Manage your account</h1>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card className="border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.45)]">
             <CardHeader className="border-b bg-background/80 py-5">
               <CardTitle className="text-xl">My Profile</CardTitle>
             </CardHeader>
@@ -52,12 +205,13 @@ export default function ProfilePage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Name</p>
-                  <Input value={name} onChange={(event) => setName(event.target.value)} />
+                  <Input className="h-11 rounded-xl bg-white" value={name} onChange={(event) => setName(event.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
                   <Input
                     type="email"
+                    className="h-11 rounded-xl bg-white"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                   />
@@ -78,16 +232,16 @@ export default function ProfilePage() {
                 </div>
               </div>
               <Button
-                className="w-full sm:w-auto"
+                className="w-full rounded-xl sm:w-auto"
                 onClick={() => mutation.mutate({ name, email })}
                 disabled={mutation.isPending}
               >
-                {mutation.isPending ? "Saving..." : "Save changes"}
+              {mutation.isPending ? "Saving..." : "Save changes"}
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="border-border/70 py-0">
+          <Card className="border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.45)]">
             <CardHeader className="border-b bg-background/80 py-5">
               <CardTitle className="text-xl">Recent Orders</CardTitle>
             </CardHeader>
@@ -95,8 +249,8 @@ export default function ProfilePage() {
               {recentOrders.length === 0 ? (
                 <p className="text-sm text-muted-foreground">You have not placed any orders yet.</p>
               ) : (
-                recentOrders.map((order: any) => (
-                  <div key={order.id} className="rounded-xl border p-4">
+                recentOrders.map((order: Order) => (
+                  <div key={order.id} className="rounded-2xl border bg-white/70 p-4">
                     <div className="flex items-center justify-between gap-4">
                       <p className="font-medium">Order #{order.id}</p>
                       <p className="text-xs text-muted-foreground">
@@ -109,6 +263,131 @@ export default function ProfilePage() {
                   </div>
                 ))
               )}
+            </CardContent>
+          </Card>
+          </div>
+
+          <Card className="mt-6 border-white/70 bg-white/85 py-0 shadow-[0_20px_45px_-35px_rgba(15,23,42,0.45)]">
+            <CardHeader className="border-b bg-background/80 py-5">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="rounded-2xl bg-accent p-3 text-accent-foreground">
+                    <MapPinHouse className="size-5" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Saved Addresses</CardTitle>
+                    <p className="mt-1 text-sm text-muted-foreground">Store delivery addresses for faster checkout.</p>
+                  </div>
+                </div>
+                <Button variant="outline" className="rounded-full bg-white" onClick={resetAddressForm}>
+                  <Plus className="size-4" />
+                  New address
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              <div className="grid gap-6 xl:grid-cols-[1fr_1.15fr]">
+                <div className="space-y-4">
+                  {savedAddresses.length === 0 ? (
+                    <div className="rounded-[1.5rem] border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+                      No saved addresses yet. Add one below to reuse it during checkout.
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+                      {savedAddresses.map((address) => (
+                        <div key={address.id} className="rounded-[1.75rem] border bg-white/80 p-5 shadow-sm">
+                          <span className="inline-flex rounded-full bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground">
+                            {address.label}
+                          </span>
+                          <div className="mt-4 space-y-2 text-sm">
+                            <p className="font-medium text-slate-950">{address.fullName}</p>
+                            <p className="text-muted-foreground">{address.addressLine1}</p>
+                            {address.addressLine2 ? (
+                              <p className="text-muted-foreground">{address.addressLine2}</p>
+                            ) : null}
+                            <p className="text-muted-foreground">{address.city}, {address.state}</p>
+                            <p className="text-muted-foreground">{address.country} - {address.pincode}</p>
+                            <p className="text-muted-foreground">{address.phone}</p>
+                          </div>
+                          <div className="mt-5 flex flex-wrap gap-3">
+                            <Button variant="outline" className="rounded-full bg-white" onClick={() => handleEditAddress(address)}>
+                              <Pencil className="size-4" />
+                              Edit
+                            </Button>
+                            <Button variant="outline" className="rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => handleRemoveAddress(address.id)}>
+                              <Trash2 className="size-4" />
+                              Remove
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-[1.75rem] border bg-white/80 p-5">
+                  <div className="mb-5">
+                    <h3 className="text-lg font-semibold">
+                      {addressForm.id ? "Edit address" : "Add a new address"}
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">These details will be available in checkout.</p>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="address-label">Address label</Label>
+                      <Input id="address-label" className="h-11 rounded-xl bg-white" value={addressForm.label} onChange={(event) => updateAddressForm("label", event.target.value)} placeholder="Home, Office, Parents' house" />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="address-fullName">Full name</Label>
+                      <Input id="address-fullName" className="h-11 rounded-xl bg-white" value={addressForm.fullName} onChange={(event) => updateAddressForm("fullName", event.target.value)} placeholder="Recipient full name" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address-email">Email</Label>
+                      <Input id="address-email" type="email" className="h-11 rounded-xl bg-white" value={addressForm.email} onChange={(event) => updateAddressForm("email", event.target.value)} placeholder="Email address" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address-phone">Phone</Label>
+                      <Input id="address-phone" className="h-11 rounded-xl bg-white" value={addressForm.phone} onChange={(event) => updateAddressForm("phone", event.target.value)} placeholder="Phone number" />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="address-line1">Address line 1</Label>
+                      <Input id="address-line1" className="h-11 rounded-xl bg-white" value={addressForm.addressLine1} onChange={(event) => updateAddressForm("addressLine1", event.target.value)} placeholder="Street address, house number" />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="address-line2">Address line 2</Label>
+                      <Input id="address-line2" className="h-11 rounded-xl bg-white" value={addressForm.addressLine2} onChange={(event) => updateAddressForm("addressLine2", event.target.value)} placeholder="Apartment, suite, landmark" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address-city">City</Label>
+                      <Input id="address-city" className="h-11 rounded-xl bg-white" value={addressForm.city} onChange={(event) => updateAddressForm("city", event.target.value)} placeholder="City" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address-state">State</Label>
+                      <Input id="address-state" className="h-11 rounded-xl bg-white" value={addressForm.state} onChange={(event) => updateAddressForm("state", event.target.value)} placeholder="State" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address-country">Country</Label>
+                      <Input id="address-country" className="h-11 rounded-xl bg-white" value={addressForm.country} onChange={(event) => updateAddressForm("country", event.target.value)} placeholder="Country" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address-pincode">Pincode</Label>
+                      <Input id="address-pincode" className="h-11 rounded-xl bg-white" value={addressForm.pincode} onChange={(event) => updateAddressForm("pincode", event.target.value)} placeholder="Postal code" />
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <Button className="rounded-xl" onClick={handleSaveAddress}>
+                      {addressForm.id ? "Update address" : "Save address"}
+                    </Button>
+                    {hasAddressDraft ? (
+                      <Button variant="outline" className="rounded-xl bg-white" onClick={resetAddressForm}>
+                        Clear
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </section>

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import AuthCard from "@/components/ui/auth/AuthCard"
+import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
@@ -10,7 +11,6 @@ import { useToast } from "@/components/providers/ToastProvider"
 import { useAuth } from "@/context/AuthContext"
 
 export default function LoginPage() {
-
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
@@ -53,47 +53,52 @@ export default function LoginPage() {
   }
 
   return (
-
     <AuthCard
       title="Sign in"
-      subtitle="Sign in or create an account"
+      subtitle="Continue to your account and resume shopping"
     >
-
       <form
         onSubmit={handleSubmit}
         className="space-y-4"
       >
+        <div className="space-y-2">
+          <Label htmlFor="login-email">Email</Label>
+          <Input
+            id="login-email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-11 rounded-xl bg-white"
+          />
+        </div>
 
-        <Input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="login-password">Password</Label>
+          <Input
+            id="login-password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-11 rounded-xl bg-white"
+          />
+        </div>
 
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <Button className="w-full">
+        <Button className="h-11 w-full rounded-xl">
           Continue
         </Button>
-
       </form>
 
-      <p className="text-sm text-center text-gray-500">
+      <p className="text-center text-sm text-muted-foreground">
         Don't have an account?{" "}
         <Link
           to="/register"
-          className="font-medium text-foreground"
+          className="font-medium text-foreground hover:text-primary"
         >
           Register
         </Link>
       </p>
-
     </AuthCard>
-
   )
 }

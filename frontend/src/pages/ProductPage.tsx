@@ -17,9 +17,9 @@ export default function ProductPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-muted/20">
+      <div className="page-shell">
         <Navbar />
-        <div className="mx-auto max-w-7xl px-4 py-12 md:px-6">
+        <div className="page-section py-12 md:py-14">
           <ProductDetailSkeleton />
         </div>
         <Footer />
@@ -29,10 +29,12 @@ export default function ProductPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-muted/20">
+      <div className="page-shell">
         <Navbar />
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center text-muted-foreground md:px-6">
-          Product not found.
+        <div className="page-section py-12 md:py-14">
+          <div className="section-panel py-16 text-center text-muted-foreground">
+            Product not found.
+          </div>
         </div>
         <Footer />
       </div>
@@ -40,13 +42,14 @@ export default function ProductPage() {
   }
 
   return (
-
-    <div className="min-h-screen bg-muted/20">
-
+    <div className="page-shell">
       <Navbar />
-
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-2 lg:items-center lg:gap-16">
-
+      <div className="page-section py-10 md:py-14">
+        <div className="mb-8">
+          <p className="section-kicker">Product page</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">Product details</h1>
+        </div>
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
         <ProductGallery image={data.image} />
 
         <ProductInfo
@@ -54,14 +57,11 @@ export default function ProductPage() {
           title={data.title}
           price={data.price}
           description={data.description}
+          stock={data.stock}
         />
-
+        </div>
       </div>
-
       <Footer />
-
     </div>
-
   )
-
 }

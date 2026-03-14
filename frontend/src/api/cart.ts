@@ -1,10 +1,22 @@
 import api from "@/lib/api"
+import type { Product } from "@/api/products"
+
+export interface CartItem {
+  id: number
+  quantity: number
+  product: Product
+}
+
+export interface Cart {
+  id: number
+  items: CartItem[]
+}
 
 export const getCart = async () => {
 
   const res = await api.get("/cart")
 
-  return res.data.data
+  return res.data.data as Cart
 
 }
 

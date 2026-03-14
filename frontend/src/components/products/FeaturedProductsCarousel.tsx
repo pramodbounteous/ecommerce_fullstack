@@ -22,17 +22,18 @@ export default function FeaturedProductsCarousel() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+    <section className="page-section py-8 md:py-10">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Featured Products</h2>
-          <p className="text-sm text-muted-foreground">Popular picks curated from the catalog.</p>
+          <p className="section-kicker">Featured picks</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Best sellers</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Top picks shoppers are loving right now.</p>
         </div>
         <div className="hidden items-center gap-2 sm:flex">
-          <Button variant="outline" size="icon" onClick={() => scrollByAmount("left")}>
+          <Button variant="outline" size="icon" className="rounded-full bg-white/70" onClick={() => scrollByAmount("left")}>
             <ChevronLeft className="size-4" />
           </Button>
-          <Button variant="outline" size="icon" onClick={() => scrollByAmount("right")}>
+          <Button variant="outline" size="icon" className="rounded-full bg-white/70" onClick={() => scrollByAmount("right")}>
             <ChevronRight className="size-4" />
           </Button>
         </div>

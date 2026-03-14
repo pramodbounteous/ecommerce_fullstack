@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode
 } from "react"
-import { X } from "lucide-react"
+import { AlertCircle, CheckCircle2, Info, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -31,9 +31,15 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null)
 
 const variantClasses: Record<ToastVariant, string> = {
-  default: "border-border bg-background",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-950",
-  error: "border-red-200 bg-red-50 text-red-950"
+  default: "border-border bg-background/95",
+  success: "border-emerald-200 bg-emerald-50/95 text-emerald-950",
+  error: "border-red-200 bg-red-50/95 text-red-950"
+}
+
+const variantIcons: Record<ToastVariant, typeof Info> = {
+  default: Info,
+  success: CheckCircle2,
+  error: AlertCircle
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -70,16 +76,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={item.id}
             className={cn(
-              "pointer-events-auto rounded-xl border px-4 py-3 shadow-lg backdrop-blur transition",
+              "pointer-events-auto rounded-2xl border px-4 py-3 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)] backdrop-blur transition animate-in slide-in-from-right-5 fade-in",
               variantClasses[item.variant]
             )}
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className="text-sm font-semibold">{item.title}</p>
+              <div className="flex items-start gap-3">
+                {(() => {
+                  const Icon = variantIcons[item.variant]
+
+                  return (
+                    <div className="mt-0.5 rounded-full bg-white/70 p-1">
+                      <Icon className="size-4" />
+                    </div>
+                  )
+                })()}
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold">{item.title}</p>
                 {item.description ? (
                   <p className="text-xs text-muted-foreground">{item.description}</p>
                 ) : null}
+              </div>
               </div>
               <Button
                 variant="ghost"

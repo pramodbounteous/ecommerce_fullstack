@@ -1,19 +1,24 @@
+import { Minus, Plus, Trash2 } from "lucide-react"
+
+import type { CartItem as CartItemType } from "@/api/cart"
 import { Button } from "@/components/ui/button"
 import { useUpdateCartItem } from "@/hooks/useUpdateCartItem"
 import { useRemoveCartItem } from "@/hooks/useRemoveCartItem"
 
 interface Props {
-  item: any
+  item: CartItemType
 }
 
 export default function CartItem({ item }: Props) {
-
   const product = item.product
+  const isOutOfStock = product.stock <= 0 || item.quantity > product.stock
+  const canIncrease = item.quantity < product.stock
 
   const updateMutation = useUpdateCartItem()
   const removeMutation = useRemoveCartItem()
 
   const increaseQty = () => {
+    if (!canIncrease) return
 
     updateMutation.mutate({
       itemId: item.id,
@@ -40,67 +45,76 @@ export default function CartItem({ item }: Props) {
   }
 
   return (
-
-    <div className="flex flex-col gap-4 rounded-xl border bg-background p-4 sm:flex-row sm:gap-6">
-
+    <div className="section-panel flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-6">
       <img
         src={product.image}
+        alt={product.title}
         className="h-24 w-24 rounded-lg object-cover"
         onError={(event) => {
           event.currentTarget.src = "https://placehold.co/200x200?text=Product"
         }}
       />
-
       <div className="flex-1">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="font-semibold">
+              {product.title}
+            </h3>
 
-        <h3 className="font-semibold">
-          {product.title}
-        </h3>
-
-        <p className="text-sm text-muted-foreground">
-          ${product.price.toFixed(2)}
-        </p>
-
-        <div className="flex items-center gap-3 mt-3">
-
-          <button
-            className="rounded-lg border px-3 py-1"
-            onClick={decreaseQty}
-          >
-            -
-          </button>
-
-          <span>{item.quantity}</span>
-
-          <button
-            className="rounded-lg border px-3 py-1"
-            onClick={increaseQty}
-          >
-            +
-          </button>
-
+            <p className="text-sm text-muted-foreground">
+              ${product.price.toFixed(2)} each
+            </p>
+            <p className={`mt-1 text-xs font-medium ${isOutOfStock ? "text-destructive" : "text-muted-foreground"}`}>
+              {product.stock <= 0
+                ? "Not in stock"
+                : item.quantity > product.stock
+                  ? `Only ${product.stock} left in stock`
+                  : `${product.stock} available`}
+            </p>
+          </div>
+          <p className="font-medium sm:hidden">
+            ${(product.price * item.quantity).toFixed(2)}
+          </p>
         </div>
 
+        <div className="mt-4 inline-flex items-center gap-3 rounded-full border bg-white p-1 shadow-sm">
+          <button
+            className="rounded-full p-2 transition hover:bg-muted"
+            onClick={decreaseQty}
+            aria-label="Decrease quantity"
+            disabled={updateMutation.isPending}
+          >
+            <Minus className="size-4" />
+          </button>
+
+          <span className="min-w-8 text-center font-medium">{item.quantity}</span>
+
+          <button
+            className="rounded-full p-2 transition hover:bg-muted"
+            onClick={increaseQty}
+            aria-label="Increase quantity"
+            disabled={updateMutation.isPending || !canIncrease}
+          >
+            <Plus className="size-4" />
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-row items-start justify-between gap-4 sm:flex-col sm:items-end">
-
         <p className="font-medium">
           ${(product.price * item.quantity).toFixed(2)}
         </p>
-
         <Button
           variant="outline"
           size="sm"
+          className="rounded-full bg-white"
           onClick={removeItem}
+          disabled={removeMutation.isPending || updateMutation.isPending}
         >
+          <Trash2 className="size-4" />
           Remove
         </Button>
-
       </div>
-
     </div>
-
   )
-
 }

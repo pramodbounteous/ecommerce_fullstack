@@ -1,43 +1,61 @@
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 
+import type { Order } from "@/api/orders"
 import OrderCard from "@/components/orders/OrderCard"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { useOrders } from "@/hooks/useOrders"
 
 export default function OrdersPage() {
-
   const { data, isLoading } = useOrders()
 
   if (isLoading) {
-    return <div className="p-10">Loading orders...</div>
+    return (
+      <div className="page-shell">
+        <Navbar />
+        <main className="page-section py-8 md:py-10">
+          <div className="mb-8">
+            <p className="section-kicker">Orders</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Review your order history.</h1>
+          </div>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="section-panel space-y-4 p-6">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-16 w-full rounded-2xl" />
+              </div>
+            ))}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
   }
 
   const orders = data || []
 
   return (
-
-    <div className="min-h-screen flex flex-col bg-muted/20">
-
+    <div className="page-shell flex flex-col">
       <Navbar />
-
       <main className="flex-grow">
-
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 md:px-6">
-
-        <h1 className="text-2xl font-semibold">
-          My Orders
-        </h1>
+        <div className="page-section space-y-6 py-8 md:py-10">
+          <div>
+            <p className="section-kicker">Orders</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+              Review your order history.
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">See delivery details, order totals, and the items in each purchase.</p>
+          </div>
 
         {orders.length === 0 && (
-
-          <p className="text-muted-foreground">
+          <div className="section-panel rounded-[1.75rem] py-16 text-center text-muted-foreground">
             No orders yet
-          </p>
-
+          </div>
         )}
 
-        {orders.map((order: any) => (
+        {orders.map((order: Order) => (
 
           <OrderCard
             key={order.id}
@@ -45,14 +63,9 @@ export default function OrdersPage() {
           />
 
         ))}
-
-      </div>
+        </div>
       </main>
-
       <Footer />
-
     </div>
-
   )
-
 }
