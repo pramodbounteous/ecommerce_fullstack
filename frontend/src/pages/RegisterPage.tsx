@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { registerUser } from "@/api/auth"
 import { useToast } from "@/components/providers/ToastProvider"
 
-export default function RegisterPage() {
+export default function RegisterPage() {      
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -33,7 +33,7 @@ export default function RegisterPage() {
         variant: "success"
       })
 
-      navigate("/login")
+      navigate("/login")          // Redirect to login page after successful registration
     } catch {
       toast({
         title: "Registration failed",

@@ -11,12 +11,12 @@ import { useToast } from "@/components/providers/ToastProvider"
 import { useAuth } from "@/context/AuthContext"
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate()          
+  const location = useLocation()                
   const { login } = useAuth()
   const { toast } = useToast()
-  const redirectTo =
-    typeof location.state === "object" &&
+  const redirectTo =                     
+    typeof location.state === "object" &&   
     location.state !== null &&
     "from" in location.state &&
     typeof location.state.from === "string"
@@ -27,7 +27,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault()     
 
     try {
       const session = await loginUser({
