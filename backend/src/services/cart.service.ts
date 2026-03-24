@@ -112,11 +112,15 @@ export async function updateCartItem(itemId: number, quantity: number) {
     throw new AppError("Cart item not found", 404);
   }
 
-  if (item.product.stock <= 0) {
+  const isReducingQuantity = quantity < item.quantity;
+
+  // Always allow decreases so users can recover from carts that became invalid
+  // after stock changed in another session or order.
+  if (!isReducingQuantity && item.product.stock <= 0) {
     throw new AppError("Not in stock", 400);
   }
 
-  if (item.product.stock < quantity) {
+  if (!isReducingQuantity && item.product.stock < quantity) {
     throw new AppError(
       `Not enough stock. Only ${item.product.stock} available.`,
       400

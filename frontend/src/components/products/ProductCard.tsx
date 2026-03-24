@@ -23,7 +23,7 @@ export default function ProductCard({
   description,
   stock = 0
 }: Props) {
-  const { mutate, isPending } = useAddToCart()
+  const { addItem, isPending } = useAddToCart()
   const isOutOfStock = stock <= 0
 
   return (
@@ -63,7 +63,7 @@ export default function ProductCard({
             className="flex-1 rounded-xl"
             onClick={(e: MouseEvent<HTMLButtonElement>) => {
               e.preventDefault()
-              mutate({
+              addItem({
                 productId: id,
                 quantity: 1
               })

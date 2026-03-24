@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 
 export default function ProtectedRoute() {
   const { isAuthenticated, isReady } = useAuth()
-  const location = useLocation()
+  const location = useLocation()              
 
   if (!isReady) {
     return null
@@ -14,5 +14,5 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
 
-  return <Outlet />
+  return <Outlet />            
 }

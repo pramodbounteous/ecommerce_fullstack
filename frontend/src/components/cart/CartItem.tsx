@@ -62,7 +62,7 @@ export default function CartItem({ item }: Props) {
             </h3>
 
             <p className="text-sm text-muted-foreground">
-              ${product.price.toFixed(2)} each
+              ${product.price.toFixed(2)} each                                      
             </p>
             <p className={`mt-1 text-xs font-medium ${isOutOfStock ? "text-destructive" : "text-muted-foreground"}`}>
               {product.stock <= 0
@@ -81,7 +81,7 @@ export default function CartItem({ item }: Props) {
           <button
             className="rounded-full p-2 transition hover:bg-muted"
             onClick={decreaseQty}
-            aria-label="Decrease quantity"
+            aria-label="Decrease quantity"                 
             disabled={updateMutation.isPending}
           >
             <Minus className="size-4" />
