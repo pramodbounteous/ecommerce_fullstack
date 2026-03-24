@@ -7,6 +7,7 @@ export function useInfiniteProducts(search: string) {
     queryKey: ["products", search],
     initialPageParam: 1,
     queryFn: ({ pageParam }) => getProducts({ pageParam, search }),
+    staleTime: 60_000,
     getNextPageParam: (lastPage) => {
       const loadedCount = lastPage.page * lastPage.limit
       return loadedCount < lastPage.total ? lastPage.page + 1 : undefined
@@ -17,6 +18,7 @@ export function useInfiniteProducts(search: string) {
 export function useFeaturedProducts() {
   return useQuery({
     queryKey: ["featured-products"],
-    queryFn: getFeaturedProducts
+    queryFn: getFeaturedProducts,
+    staleTime: 60_000
   })
 }

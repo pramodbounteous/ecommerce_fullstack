@@ -30,7 +30,7 @@ export const addToCart = async (
     quantity
   })
 
-  return res.data
+  return res.data 
 
 }
 

@@ -11,7 +11,7 @@ import { useProduct } from "@/hooks/useProduct"
 
 export default function ProductPage() {
 
-  const { id } = useParams()
+  const { id } = useParams()      
 
   const { data, isLoading } = useProduct(id!)
 

@@ -16,8 +16,8 @@ const api = axios.create({
   withCredentials: true
 })
 
-let refreshPromise: Promise<string> | null = null
-let unauthorizedHandler: (() => void) | null = null
+let refreshPromise: Promise<string> | null = null     
+let unauthorizedHandler: (() => void) | null = null   // Handler to be called on 401 responses when token refresh fails.
 
 interface RetryRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean

@@ -20,7 +20,7 @@ export default function ProductInfo({
   stock
 }: Props) {
   const [qty, setQty] = useState(1)
-  const { mutate, isPending } = useAddToCart()
+  const { addItem, isPending } = useAddToCart()
   const isOutOfStock = stock <= 0
 
   const handleAdd = () => {
@@ -28,7 +28,7 @@ export default function ProductInfo({
       return
     }
 
-    mutate({
+    addItem({
       productId: id,
       quantity: qty
     })
