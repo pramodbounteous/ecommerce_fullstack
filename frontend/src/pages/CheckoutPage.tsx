@@ -2,17 +2,24 @@ import { ChevronDown, CreditCard, MapPin, ShieldCheck } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import {
+  createSavedAddress,
+  formatSavedAddress,
+  updateSavedAddress,
+  type SavedAddressInput
+} from "@/api/addresses"
 import type { CartItem } from "@/api/cart"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useAuth } from "@/context/AuthContext"
-import { formatSavedAddress, getSavedAddresses, saveAddress, type SavedAddress } from "@/lib/saved-addresses"
+import { useToast } from "@/components/providers/ToastProvider"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { useCart } from "@/hooks/useCart"
 import { useCheckout } from "@/hooks/useCheckout"
+import { useSavedAddresses } from "@/hooks/useSavedAddresses"
 
 interface CheckoutAddressForm {
   label: string
@@ -43,9 +50,10 @@ const emptyAddressForm: CheckoutAddressForm = {
 export default function CheckoutPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { toast } = useToast()
   const { data } = useCart()
   const checkoutMutation = useCheckout()
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const { data: savedAddresses = [], refetch: refetchSavedAddresses } = useSavedAddresses(Boolean(user?.id))
   const [selectedAddressId, setSelectedAddressId] = useState("")
   const [saveForLater, setSaveForLater] = useState(false)
   const [form, setForm] = useState<CheckoutAddressForm>({
@@ -66,7 +74,7 @@ export default function CheckoutPage() {
   const shipping: number = 0
   const tax = subtotal * 0.08
   const total = subtotal + shipping + tax
-  const selectedAddress = savedAddresses.find((address) => address.id === selectedAddressId)
+  const selectedAddress = savedAddresses.find((address) => String(address.id) === selectedAddressId)
   const composedAddress = [
     form.fullName,
     form.email,
@@ -98,23 +106,23 @@ export default function CheckoutPage() {
       return
     }
 
-    const nextSavedAddresses = getSavedAddresses(user.id)
-    setSavedAddresses(nextSavedAddresses)
+    if (savedAddresses.length > 0) {
+      const currentAddress =
+        savedAddresses.find((address) => String(address.id) === selectedAddressId) ??
+        savedAddresses[0]
 
-    if (nextSavedAddresses.length > 0) {
-      const firstAddress = nextSavedAddresses[0]
-      setSelectedAddressId(firstAddress.id)
+      setSelectedAddressId(String(currentAddress.id))
       setForm({
-        label: firstAddress.label,
-        fullName: firstAddress.fullName,
-        email: firstAddress.email,
-        phone: firstAddress.phone,
-        addressLine1: firstAddress.addressLine1,
-        addressLine2: firstAddress.addressLine2 ?? "",
-        city: firstAddress.city,
-        state: firstAddress.state,
-        country: firstAddress.country,
-        pincode: firstAddress.pincode
+        label: currentAddress.label,
+        fullName: currentAddress.fullName,
+        email: currentAddress.email,
+        phone: currentAddress.phone,
+        addressLine1: currentAddress.addressLine1,
+        addressLine2: currentAddress.addressLine2 ?? "",
+        city: currentAddress.city,
+        state: currentAddress.state,
+        country: currentAddress.country,
+        pincode: currentAddress.pincode
       })
       return
     }
@@ -125,7 +133,7 @@ export default function CheckoutPage() {
       fullName: user?.name ?? "",
       email: user?.email ?? ""
     })
-  }, [user?.email, user?.id, user?.name])
+  }, [savedAddresses, selectedAddressId, user?.email, user?.id, user?.name])
 
   const updateForm = <K extends keyof CheckoutAddressForm>(key: K, value: CheckoutAddressForm[K]) => {
     setForm((current) => ({
@@ -137,7 +145,7 @@ export default function CheckoutPage() {
   const handleSavedAddressChange = (addressId: string) => {
     setSelectedAddressId(addressId)
 
-    const nextAddress = savedAddresses.find((item) => item.id === addressId)
+    const nextAddress = savedAddresses.find((item) => String(item.id) === addressId)
 
     if (!nextAddress) {
       setForm((current) => ({
@@ -168,8 +176,7 @@ export default function CheckoutPage() {
     }
 
     if (user?.id && saveForLater) {
-      const nextAddresses = saveAddress(user.id, {
-        id: selectedAddressId || `${Date.now()}`,
+      const payload: SavedAddressInput = {
         label: form.label.trim() || `${form.city} address`,
         fullName: form.fullName.trim(),
         email: form.email.trim(),
@@ -180,9 +187,33 @@ export default function CheckoutPage() {
         state: form.state.trim(),
         country: form.country.trim(),
         pincode: form.pincode.trim()
-      })
+      }
 
-      setSavedAddresses(nextAddresses)
+      if (selectedAddressId) {
+        try {
+          await updateSavedAddress(Number(selectedAddressId), payload)
+        } catch {
+          toast({
+            title: "Address save failed",
+            description: "The address could not be saved to your profile.",
+            variant: "error"
+          })
+          return
+        }
+      } else {
+        try {
+          await createSavedAddress(payload)
+        } catch {
+          toast({
+            title: "Address save failed",
+            description: "The address could not be saved to your profile.",
+            variant: "error"
+          })
+          return
+        }
+      }
+
+      await refetchSavedAddresses()
     }
 
     await checkoutMutation.mutateAsync({
@@ -234,7 +265,7 @@ export default function CheckoutPage() {
                   >
                     <option value="">Choose address</option>
                     {savedAddresses.map((address) => (
-                      <option key={address.id} value={address.id}>
+                      <option key={address.id} value={String(address.id)}>
                         {address.label} - {address.city}
                       </option>
                     ))}

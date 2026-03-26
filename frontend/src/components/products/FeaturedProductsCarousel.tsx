@@ -8,7 +8,7 @@ import { useFeaturedProducts } from "@/hooks/useProducts"
 
 export default function FeaturedProductsCarousel() {
   const { data, isLoading } = useFeaturedProducts()
-  const scrollRef = useRef<HTMLDivElement | null>(null)
+  const scrollRef = useRef<HTMLDivElement | null>(null)                                      
 
   const scrollByAmount = (direction: "left" | "right") => {
     if (!scrollRef.current) {

@@ -110,7 +110,7 @@ export async function refreshAccessToken(token: string) {
     throw new AppError("Refresh token is required", 401);
   }
 
-  const payload: any = verifyRefreshToken(token);
+  const payload: any = verifyRefreshToken(token);                           
 
   const storedToken = await prisma.refreshToken.findFirst({
     where: { token }

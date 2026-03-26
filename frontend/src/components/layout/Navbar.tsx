@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useCart } from "@/hooks/useCart"
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)                                                    
   const { isAuthenticated, logout } = useAuth()
   const { data: cart } = useCart(isAuthenticated)
   const location = useLocation()
