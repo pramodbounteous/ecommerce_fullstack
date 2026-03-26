@@ -1,28 +1,19 @@
-import { ChevronDown, CreditCard, MapPin, ShieldCheck } from "lucide-react"
-import { useEffect, useState } from "react"
+import { CreditCard, MapPin, ShieldCheck } from "lucide-react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import {
-  createSavedAddress,
-  formatSavedAddress,
-  updateSavedAddress,
-  type SavedAddressInput
-} from "@/api/addresses"
 import type { CartItem } from "@/api/cart"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useAuth } from "@/context/AuthContext"
-import { useToast } from "@/components/providers/ToastProvider"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { useCart } from "@/hooks/useCart"
 import { useCheckout } from "@/hooks/useCheckout"
-import { useSavedAddresses } from "@/hooks/useSavedAddresses"
 
 interface CheckoutAddressForm {
-  label: string
   fullName: string
   email: string
   phone: string
@@ -35,7 +26,6 @@ interface CheckoutAddressForm {
 }
 
 const emptyAddressForm: CheckoutAddressForm = {
-  label: "",
   fullName: "",
   email: "",
   phone: "",
@@ -47,34 +37,35 @@ const emptyAddressForm: CheckoutAddressForm = {
   pincode: ""
 }
 
-export default function CheckoutPage() {
-  const navigate = useNavigate()
-  const { user } = useAuth()
-  const { toast } = useToast()
-  const { data } = useCart()
-  const checkoutMutation = useCheckout()
-  const { data: savedAddresses = [], refetch: refetchSavedAddresses } = useSavedAddresses(Boolean(user?.id))
-  const [selectedAddressId, setSelectedAddressId] = useState("")
-  const [saveForLater, setSaveForLater] = useState(false)
-  const [form, setForm] = useState<CheckoutAddressForm>({
+function createDefaultAddressForm(user?: {
+  name?: string | null
+  email?: string | null
+}): CheckoutAddressForm {
+  return {
     ...emptyAddressForm,
     fullName: user?.name ?? "",
     email: user?.email ?? ""
-  })
+  }
+}
+
+export default function CheckoutPage() {
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const { data } = useCart()
+  const checkoutMutation = useCheckout()
+  const [form, setForm] = useState<CheckoutAddressForm>(() => createDefaultAddressForm(user))
 
   const items = data?.items || []
   const unavailableItems = items.filter(
     (item) => item.product.stock <= 0 || item.quantity > item.product.stock
   )
   const subtotal = items.reduce(
-    (acc: number, item: CartItem) =>
-      acc + item.product.price * item.quantity,
+    (acc: number, item: CartItem) => acc + item.product.price * item.quantity,
     0
   )
   const shipping: number = 0
   const tax = subtotal * 0.08
   const total = subtotal + shipping + tax
-  const selectedAddress = savedAddresses.find((address) => String(address.id) === selectedAddressId)
   const composedAddress = [
     form.fullName,
     form.email,
@@ -101,40 +92,6 @@ export default function CheckoutPage() {
     unavailableItems.length === 0 &&
     !checkoutMutation.isPending
 
-  useEffect(() => {
-    if (!user?.id) {
-      return
-    }
-
-    if (savedAddresses.length > 0) {
-      const currentAddress =
-        savedAddresses.find((address) => String(address.id) === selectedAddressId) ??
-        savedAddresses[0]
-
-      setSelectedAddressId(String(currentAddress.id))
-      setForm({
-        label: currentAddress.label,
-        fullName: currentAddress.fullName,
-        email: currentAddress.email,
-        phone: currentAddress.phone,
-        addressLine1: currentAddress.addressLine1,
-        addressLine2: currentAddress.addressLine2 ?? "",
-        city: currentAddress.city,
-        state: currentAddress.state,
-        country: currentAddress.country,
-        pincode: currentAddress.pincode
-      })
-      return
-    }
-
-    setSelectedAddressId("")
-    setForm({
-      ...emptyAddressForm,
-      fullName: user?.name ?? "",
-      email: user?.email ?? ""
-    })
-  }, [savedAddresses, selectedAddressId, user?.email, user?.id, user?.name])
-
   const updateForm = <K extends keyof CheckoutAddressForm>(key: K, value: CheckoutAddressForm[K]) => {
     setForm((current) => ({
       ...current,
@@ -142,78 +99,9 @@ export default function CheckoutPage() {
     }))
   }
 
-  const handleSavedAddressChange = (addressId: string) => {
-    setSelectedAddressId(addressId)
-
-    const nextAddress = savedAddresses.find((item) => String(item.id) === addressId)
-
-    if (!nextAddress) {
-      setForm((current) => ({
-        ...current,
-        fullName: user?.name ?? current.fullName,
-        email: user?.email ?? current.email
-      }))
-      return
-    }
-
-    setForm({
-      label: nextAddress.label,
-      fullName: nextAddress.fullName,
-      email: nextAddress.email,
-      phone: nextAddress.phone,
-      addressLine1: nextAddress.addressLine1,
-      addressLine2: nextAddress.addressLine2 ?? "",
-      city: nextAddress.city,
-      state: nextAddress.state,
-      country: nextAddress.country,
-      pincode: nextAddress.pincode
-    })
-  }
-
   const handleCheckout = async () => {
     if (!canCheckout) {
       return
-    }
-
-    if (user?.id && saveForLater) {
-      const payload: SavedAddressInput = {
-        label: form.label.trim() || `${form.city} address`,
-        fullName: form.fullName.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        addressLine1: form.addressLine1.trim(),
-        addressLine2: form.addressLine2.trim(),
-        city: form.city.trim(),
-        state: form.state.trim(),
-        country: form.country.trim(),
-        pincode: form.pincode.trim()
-      }
-
-      if (selectedAddressId) {
-        try {
-          await updateSavedAddress(Number(selectedAddressId), payload)
-        } catch {
-          toast({
-            title: "Address save failed",
-            description: "The address could not be saved to your profile.",
-            variant: "error"
-          })
-          return
-        }
-      } else {
-        try {
-          await createSavedAddress(payload)
-        } catch {
-          toast({
-            title: "Address save failed",
-            description: "The address could not be saved to your profile.",
-            variant: "error"
-          })
-          return
-        }
-      }
-
-      await refetchSavedAddresses()
     }
 
     await checkoutMutation.mutateAsync({
@@ -222,7 +110,6 @@ export default function CheckoutPage() {
     })
 
     navigate("/orders")
-
   }
 
   return (
@@ -250,46 +137,11 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold">Shipping Address</h2>
-                  <p className="text-sm text-muted-foreground">Select a saved address or enter delivery details below.</p>
+                  <p className="text-sm text-muted-foreground">Enter your delivery details for this order.</p>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="saved-address">Use saved address</Label>
-                <div className="relative">
-                  <select
-                    id="saved-address"
-                    value={selectedAddressId}
-                    onChange={(event) => handleSavedAddressChange(event.target.value)}
-                    className="h-12 w-full appearance-none rounded-xl border border-input bg-white px-4 pr-10 text-sm shadow-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                  >
-                    <option value="">Choose address</option>
-                    {savedAddresses.map((address) => (
-                      <option key={address.id} value={String(address.id)}>
-                        {address.label} - {address.city}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted-foreground" />
-                </div>
-                {selectedAddress ? (
-                  <p className="text-sm text-muted-foreground">
-                    {formatSavedAddress(selectedAddress)}
-                  </p>
-                ) : null}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="checkout-label">Address label</Label>
-                  <Input
-                    id="checkout-label"
-                    placeholder="Home, Office, Apartment"
-                    value={form.label}
-                    onChange={(event) => updateForm("label", event.target.value)}
-                    className="h-12 rounded-xl bg-white"
-                  />
-                </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="checkout-name">Full name</Label>
                   <Input
@@ -383,16 +235,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <label className="flex items-center gap-3 rounded-2xl border bg-white/70 px-4 py-3 text-sm text-foreground">
-                <input
-                  type="checkbox"
-                  checked={saveForLater}
-                  onChange={(event) => setSaveForLater(event.target.checked)}
-                  className="size-4 rounded border-input"
-                />
-                Save this address to your profile for future orders
-              </label>
-
               <div className="rounded-2xl border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
                 Cash on delivery is available for this order.
               </div>
@@ -404,9 +246,7 @@ export default function CheckoutPage() {
                   <CreditCard className="size-4" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold">
-                    Order Summary
-                  </h2>
+                  <h2 className="text-lg font-semibold">Order Summary</h2>
                   <p className="text-sm text-muted-foreground">Payment method: COD</p>
                 </div>
               </div>
