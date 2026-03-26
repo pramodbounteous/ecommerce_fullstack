@@ -62,9 +62,10 @@ export async function listAddresses(req: Request, res: Response) {
 
 export async function editAddress(req: Request, res: Response) {
 
+  const user = (req as any).user;
   const id = Number(req.params.id);
 
-  const address = await updateAddress(id, req.body);
+  const address = await updateAddress(user.userId, id, req.body);
 
   res.json({
     success: true,
@@ -75,9 +76,10 @@ export async function editAddress(req: Request, res: Response) {
 
 export async function removeAddress(req: Request, res: Response) {
 
+  const user = (req as any).user;
   const id = Number(req.params.id);
 
-  await deleteAddress(id);
+  await deleteAddress(user.userId, id);
 
   res.json({
     success: true,

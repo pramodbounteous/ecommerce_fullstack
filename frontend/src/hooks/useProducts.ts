@@ -19,6 +19,6 @@ export function useFeaturedProducts() {
   return useQuery({
     queryKey: ["featured-products"],
     queryFn: getFeaturedProducts,
-    staleTime: 60_000
+    staleTime: 60_000                           
   })
 }

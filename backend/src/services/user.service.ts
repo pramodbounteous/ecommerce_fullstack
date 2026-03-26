@@ -61,12 +61,26 @@ export async function addAddress(userId: number, data: any) {
 export async function getAddresses(userId: number) {
 
   return prisma.address.findMany({
-    where: { userId }
+    where: { userId },
+    orderBy: {
+      id: "desc"
+    }
   });
 
 }
 
-export async function updateAddress(id: number, data: any) {
+export async function updateAddress(userId: number, id: number, data: any) {
+
+  const existing = await prisma.address.findFirst({
+    where: {
+      id,
+      userId
+    }
+  });
+
+  if (!existing) {
+    throw new AppError("Address not found", 404);
+  }
 
   return prisma.address.update({
     where: { id },
@@ -75,7 +89,18 @@ export async function updateAddress(id: number, data: any) {
 
 }
 
-export async function deleteAddress(id: number) {
+export async function deleteAddress(userId: number, id: number) {
+
+  const existing = await prisma.address.findFirst({
+    where: {
+      id,
+      userId
+    }
+  });
+
+  if (!existing) {
+    throw new AppError("Address not found", 404);
+  }
 
   return prisma.address.delete({
     where: { id }

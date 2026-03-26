@@ -85,7 +85,7 @@ export async function getUserOrders(userId: number) {
 
 }
 
-export async function getOrderDetails(orderId: number) {
+export async function getOrderDetails(userId: number, orderId: number) {
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -96,7 +96,7 @@ export async function getOrderDetails(orderId: number) {
     }
   });
 
-  if (!order) {
+  if (!order || order.userId !== userId) {
     throw new AppError("Order not found", 404);
   }
 

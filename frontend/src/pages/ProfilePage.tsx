@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import type { Order } from "@/api/orders"
+import type { SavedAddress, SavedAddressInput } from "@/api/addresses"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -12,16 +13,15 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 import { updateProfile } from "@/api/users"
 import { useOrders } from "@/hooks/useOrders"
-import { useToast } from "@/components/providers/ToastProvider"
 import {
-  getSavedAddresses,
-  removeSavedAddress,
-  saveAddress,
-  type SavedAddress
-} from "@/lib/saved-addresses"
+  useDeleteAddress,
+  useSaveAddress,
+  useSavedAddresses
+} from "@/hooks/useSavedAddresses"
+import { useToast } from "@/components/providers/ToastProvider"
 
 interface AddressFormState {
-  id?: string
+  id?: number
   label: string
   fullName: string
   email: string
@@ -51,9 +51,11 @@ export default function ProfilePage() {
   const { user, setUser } = useAuth()
   const { toast } = useToast()
   const { data: orders = [] } = useOrders()
+  const { data: savedAddresses = [] } = useSavedAddresses(Boolean(user?.id))
+  const saveAddressMutation = useSaveAddress()
+  const deleteAddressMutation = useDeleteAddress()
   const [name, setName] = useState(user?.name ?? "")
   const [email, setEmail] = useState(user?.email ?? "")
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
   const [addressForm, setAddressForm] = useState<AddressFormState>({
     ...emptyAddressForm,
     fullName: user?.name ?? "",
@@ -90,7 +92,6 @@ export default function ProfilePage() {
       return
     }
 
-    setSavedAddresses(getSavedAddresses(user.id))
     setAddressForm((current) => ({
       ...current,
       fullName: user.name,
@@ -136,8 +137,7 @@ export default function ProfilePage() {
       return
     }
 
-    const nextAddresses = saveAddress(user.id, {
-      id: addressForm.id ?? `${Date.now()}`,
+    const payload: SavedAddressInput = {
       label: addressForm.label.trim(),
       fullName: addressForm.fullName.trim(),
       email: addressForm.email.trim(),
@@ -148,16 +148,32 @@ export default function ProfilePage() {
       state: addressForm.state.trim(),
       country: addressForm.country.trim(),
       pincode: addressForm.pincode.trim()
-    })
+    }
 
-    setSavedAddresses(nextAddresses)
-    resetAddressForm()
-    toast({
-      title: addressForm.id ? "Address updated" : "Address saved",
-      description: "Your delivery address is ready for checkout.",
-      variant: "success"
-    })
+    saveAddressMutation.mutate(
+      {
+        id: addressForm.id,
+        data: payload
+      },
+      {
+        onSuccess: () => {
+          resetAddressForm()
+        }
+      }
+    )
   }
+
+  useEffect(() => {
+    if (!addressForm.id) {
+      return
+    }
+
+    const selectedAddressExists = savedAddresses.some((address) => address.id === addressForm.id)
+
+    if (!selectedAddressExists) {
+      resetAddressForm()
+    }
+  }, [addressForm.id, savedAddresses, user?.email, user?.name])
 
   const handleEditAddress = (address: SavedAddress) => {
     setAddressForm({
@@ -175,16 +191,12 @@ export default function ProfilePage() {
     })
   }
 
-  const handleRemoveAddress = (addressId: string) => {
+  const handleRemoveAddress = (addressId: number) => {
     if (!user?.id) {
       return
     }
 
-    setSavedAddresses(removeSavedAddress(user.id, addressId))
-
-    if (addressForm.id === addressId) {
-      resetAddressForm()
-    }
+    deleteAddressMutation.mutate(addressId)
   }
 
   return (
@@ -378,7 +390,11 @@ export default function ProfilePage() {
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <Button className="rounded-xl" onClick={handleSaveAddress}>
-                      {addressForm.id ? "Update address" : "Save address"}
+                      {saveAddressMutation.isPending
+                        ? "Saving..."
+                        : addressForm.id
+                          ? "Update address"
+                          : "Save address"}
                     </Button>
                     {hasAddressDraft ? (
                       <Button variant="outline" className="rounded-xl bg-white" onClick={resetAddressForm}>

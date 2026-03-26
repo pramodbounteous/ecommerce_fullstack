@@ -13,10 +13,10 @@ const apiBaseUrl =
 
 const api = axios.create({
   baseURL: apiBaseUrl,
-  withCredentials: true
+  withCredentials: true                   
 })
 
-let refreshPromise: Promise<string> | null = null     
+let refreshPromise: Promise<string> | null = null      //A variable that stores an ongoing token refresh request.
 let unauthorizedHandler: (() => void) | null = null   // Handler to be called on 401 responses when token refresh fails.
 
 interface RetryRequestConfig extends InternalAxiosRequestConfig {
