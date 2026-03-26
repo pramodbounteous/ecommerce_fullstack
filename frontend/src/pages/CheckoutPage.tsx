@@ -40,7 +40,7 @@ const emptyAddressForm: CheckoutAddressForm = {
 function createDefaultAddressForm(user?: {
   name?: string | null
   email?: string | null
-}): CheckoutAddressForm {
+} | null): CheckoutAddressForm {
   return {
     ...emptyAddressForm,
     fullName: user?.name ?? "",
